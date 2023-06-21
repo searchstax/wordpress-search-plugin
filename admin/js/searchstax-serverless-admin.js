@@ -1,0 +1,54 @@
+(function( $ ) {
+	'use strict';
+
+	/**
+	 * All of the code for your admin-facing JavaScript source
+	 * should reside in this file.
+	 *
+	 * Note: It has been assumed you will write jQuery code here, so the
+	 * $ function reference has been prepared for usage within the scope
+	 * of this function.
+	 *
+	 * This enables you to define handlers, for when the DOM is ready:
+	 *
+	 * $(function() {
+	 *
+	 * });
+	 *
+	 * When the window is loaded:
+	 *
+	 * $( window ).load(function() {
+	 *
+	 * });
+	 *
+	 * ...and/or other possibilities.
+	 *
+	 * Ideally, it is not considered best practise to attach more than a
+	 * single DOM-ready or window-load handler for a particular page.
+	 * Although scripts in the WordPress core, Plugins and Themes may be
+	 * practising this, we should strive to set a better example in our own work.
+	 */
+	console.log('fart');
+
+	$('#check_server_status').onClick(function() {
+
+	    //var user_input = $(this).val();
+	    //var user_input_last = $.trim(user_input.split(',').pop());
+
+	    $.ajax({
+	        url: my-plugin.ajax_url,
+	        type: 'POST',
+	        data: {
+	            'action': 'check_api_status'
+	        },
+	        success:function(data) {
+	            console.log(data);
+	        },
+	        error: function(errorThrown){
+	            console.log(errorThrown);
+	        }
+	    });
+
+	});
+
+})( jQuery );
