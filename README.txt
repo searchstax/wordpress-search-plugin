@@ -1,4 +1,14 @@
-=== Plugin Name ===
+Installing for test/dev purposes
+
+1. Clone to WordPress base directory > wp-content > plugins
+2. Log into admin
+3. Go to plugins and activate 'Searchstax Serverless'
+4. Add tokens and API endpoints under 'Settings' > Searchstax Serverless
+5. Create new search page under 'Search Result Pages'
+
+
+
+=== Plugin Name [WP Plugin Boilerplate README] ===
 Contributors: (this should be a list of wordpress.org userid's)
 Donate link: http://example.com/
 Tags: comments, spam
