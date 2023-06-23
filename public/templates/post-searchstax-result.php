@@ -34,6 +34,10 @@ $query = '';
 if ( isset($_GET['searchQuery']) ) {
     $query = $_GET['searchQuery'];
 }
+$start = 0;
+if ( isset($_GET['searchStart']) ) {
+    $start = $_GET['searchStart'];
+}
 
 ?>
 
@@ -62,6 +66,7 @@ if ( isset($_GET['searchQuery']) ) {
             if ( count($selected_tags) > 0 ) {
                 $url .= '&fq=tags:(' . join(' OR ', $selected_tags) . ')';
             }
+            $url .= '&start=' . $start;
             $url .= '&rows=' . $meta['search_result_count'][0];
             $url .= '&wt=json';
             $args = array(
@@ -105,7 +110,14 @@ if ( isset($_GET['searchQuery']) ) {
                     }
 
                 }
-                echo '<div>Showing <strong>' . $json['response']['numFound'] . '</strong> results for <strong>"' . $query . '"</strong></div>';
+                echo '<div>Showing <strong>' . ($start + 1) . ' - ';
+                if ( ($start + $meta['search_result_count'][0]) > $json['response']['numFound']) {
+                    echo $json['response']['numFound'];
+                }
+                else {
+                    echo $start + $meta['search_result_count'][0];
+                }
+                echo '</strong> of <strong>' . $json['response']['numFound'] . '</strong> results for <strong>"' . $query . '"</strong></div>';
                 echo '<div class="searchstax_serverless_facet">';
                 foreach ( $categories as $category => $count) {
                     echo '<div class="searchstax_serverless_facet">';
@@ -151,6 +163,27 @@ if ( isset($_GET['searchQuery']) ) {
                     }
                     echo '</div>';
                 }
+                echo '</div>';
+                echo '<div class="searchstax_serverless_result_pagination">';
+                echo '<form>';
+                echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                echo '<input type="hidden" name="searchStart" value="' . ($start - $meta['search_result_count'][0]) . '">';
+                echo '<input type="submit" value="Previous"';
+                if ( $start == 0 ) {
+                    echo ' disabled="true"';
+                }
+                echo '>';
+                echo '</form>';
+                echo 'Page ' . (ceil($start / $meta['search_result_count'][0]) + 1) . ' of ' . ceil($json['response']['numFound'] / $meta['search_result_count'][0]);
+                echo '<form>';
+                echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                echo '<input type="hidden" name="searchStart" value="' . ($start + $meta['search_result_count'][0]) . '">';
+                echo '<input type="submit" value="Next"';
+                if ( ($start + $meta['search_result_count'][0]) > $json['response']['numFound'] ) {
+                    echo ' disabled="true"';
+                }
+                echo '>';
+                echo '</form>';
                 echo '</div>';
                 echo '</div>';
                 //echo '<pre>' . var_dump($json);

@@ -24,8 +24,8 @@
 }
 
 .searchstax_serverless_grid {
-  display: grid;
-  grid-template-columns: auto auto auto;
+    display: grid;
+    grid-template-columns: auto auto auto;
 }
 
 .searchstax_serverless_inline {
@@ -38,4 +38,10 @@
     border: solid;
     border-width: 1px;
     border-color: #DDDDDD;
+}
+
+.searchstax_serverless_result_pagination {
+    margin: 12px 0;
+    display: grid;
+    grid-template-columns: auto auto auto;
 }
