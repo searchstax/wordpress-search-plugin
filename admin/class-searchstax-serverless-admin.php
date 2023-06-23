@@ -151,6 +151,12 @@ class Searchstax_Serverless_Admin {
 			'searchstax_serverless_api_update',
 			array( $this, 'sanitize_token' )
 		);
+
+		register_setting(
+			'searchstax_serverless_account',
+			'searchstax_serverless_site_search',
+			array( $this, 'sanitize_token' )
+		);
 	}
 
 	public function search_result_editor() {
@@ -172,7 +178,7 @@ class Searchstax_Serverless_Admin {
 		echo '<h2>Index Status</h2>';
 
 		if ( $token != '' && $select_api != '' ) {
-			$this->index_content();
+			//$this->index_content();
 
 			$url = $select_api . '?q=*:*&wt=json&indent=true';
 			$args = array(
@@ -430,6 +436,11 @@ class Searchstax_Serverless_Admin {
 	 */
 
 	public function display_options_page() {
+		$created_search_pages = get_posts([
+			'post_type' => 'searchstax-result',
+  			'numberposts' => -1
+		]);
+		$selected_search_page = get_option('searchstax_serverless_site_search');
 		?>
 			<div class="wrap">
 				<h1>SearchStax Serverless Options</h1>
@@ -468,8 +479,33 @@ class Searchstax_Serverless_Admin {
 									<td><input type="text" name="searchstax_serverless_token_write" value="<?php echo esc_attr( get_option('searchstax_serverless_token_write') ); ?>" /></td>
 								</tr>
 								<tr valign="top">
-								<th scope="row">Update API</th>
-								<td><input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" /></td>
+									<th scope="row">Update API</th>
+									<td><input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" /></td>
+								</tr>
+								<tr valign="top">
+									<th scope="row" colspan="2">
+										<h3>Site-Wide Search Page</h3>
+									</th>
+								</tr>
+								<tr valign="top">
+									<td colspan="2"><p>Set the result page to use for site-wide search</p></td>
+								</tr>
+								<tr valign="top">
+									<th scope="row">Search Page</th>
+									<td>
+										<select name="searchstax_serverless_site_search">
+											<option value="">None</option>
+											<?php
+												foreach ( $created_search_pages as $this_page ) {
+													echo '<option value="' . $this_page->post_name . '"';
+													if ( $selected_search_page == $this_page->post_name ) {
+														echo ' selected';
+													}
+													echo '>' . $this_page->post_title . '</option>';
+												}
+											?>
+										</select>
+									</td>
 								</tr>
 							</table>
 							<?php submit_button(); ?>

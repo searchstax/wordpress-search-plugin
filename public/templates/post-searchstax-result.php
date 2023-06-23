@@ -42,7 +42,7 @@ if ( isset($_GET['searchQuery']) ) {
     <div>
         <form action="">
             <div class="searchstax_serverless_search_bar">
-                <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php $query; ?>" />
+                <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php $query; ?>" autocomplete="off" />
                 <input class="searchstax_serverless_search_submit" type="submit" value="Search" />
             </div>
         </form>
@@ -52,7 +52,7 @@ if ( isset($_GET['searchQuery']) ) {
         $select_api = get_option('searchstax_serverless_api_select');
         if ( $query != '' && $token != '' && $select_api != '' ) {
 
-            $url = $select_api . '?q=body:*' . $query . '*';
+            $url = $select_api . '?q=(body:*' . $query . '* OR title:*' . $query . '*)';
             if ( count($selected_post_types) > 0 ) {
                 $url .= '&fq=post_type:(' . join(' OR ', $selected_post_types) . ')';
             }

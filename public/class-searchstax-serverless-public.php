@@ -103,7 +103,6 @@ class Searchstax_Serverless_Public {
 	public function add_search_template( $template ) {
 		if ( get_post_type() == 'searchstax-result' ) {
 			return plugin_dir_path( dirname( __FILE__ ) ) . 'public/templates/post-searchstax-result.php';
-			//return locate_template('post-searchstax-result.php');
 		}
 		return $template;
 	}
@@ -113,14 +112,12 @@ class Searchstax_Serverless_Public {
 		 * Custom hook to intercept ?s=* requests
 		 */
 
-		/*
-		if ( isset($query->query['s']) ) {
-			wp_redirect('fart');
+		$selected_search_page = get_option('searchstax_serverless_site_search');
+		if ( $selected_search_page !== '' && isset($query->query['s']) ) {
+			wp_redirect('searchstax-result/' . $selected_search_page . '?searchQuery=' . $query->query['s']);
 			exit;
 			die();
-			// it's a search!
 		}
-		*/
 	}
 
 }
