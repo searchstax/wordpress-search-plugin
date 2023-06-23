@@ -108,4 +108,19 @@ class Searchstax_Serverless_Public {
 		return $template;
 	}
 
+	public function add_search_intercept( $query ) {
+		/*
+		 * Custom hook to intercept ?s=* requests
+		 */
+
+		/*
+		if ( isset($query->query['s']) ) {
+			wp_redirect('fart');
+			exit;
+			die();
+			// it's a search!
+		}
+		*/
+	}
+
 }

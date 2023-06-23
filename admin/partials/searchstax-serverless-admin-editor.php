@@ -17,8 +17,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once ABSPATH . 'wp-admin/admin-header.php';
+
 $post = $GLOBALS['post'];
 $meta = get_post_meta($post->ID);
+$post_types = get_post_types();
+$categories = get_categories();
+$tags = get_tags();
+
+$selected_post_types = array();
+$selected_categories = array();
+$selected_tags = array();
+
+if ( get_post_meta($post->ID, 'search_result_post_types', true) != '' ) {
+    $selected_post_types = get_post_meta($post->ID, 'search_result_post_types', true);
+}
+if ( get_post_meta($post->ID, 'search_result_post_categories', true) != '' ) {
+    $selected_categories = get_post_meta($post->ID, 'search_result_post_categories', true);
+}
+if ( get_post_meta($post->ID, 'search_result_post_tags', true) != '' ) {
+    $selected_tags = get_post_meta($post->ID, 'search_result_post_tags', true);
+}
+
+$unindexable_types = array(
+    'attachment',
+    'revision',
+    'nav_menu_item',
+    'custom_css',
+    'customize_changeset',
+    'oembed_cache',
+    'user_request',
+    'wp_block',
+    'wp_template',
+    'wp_template_part',
+    'wp_global_styles',
+    'wp_navigation',
+    'searchstax-result'
+);
 ?>
 
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
@@ -28,6 +62,7 @@ $meta = get_post_meta($post->ID);
         <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
             <input type="hidden" name="action" value="search_result_edit">
             <input type="hidden" name="search_page_id" value="<?php if ( isset($post->ID) ) { echo $post->ID; } ?>">
+            <input type="hidden" name="search_status" value="publish" />
             <div>
                 <h2>Name</h2>
                 <input type="text" name="search_title" value="<?php 
@@ -54,7 +89,53 @@ $meta = get_post_meta($post->ID);
                     <option value="30"<?php if ( isset($meta['search_result_count']) && $meta['search_result_count'][0] == "30") { echo ' selected'; } ?>>30 per page</option>
                     <option value="50"<?php if ( isset($meta['search_result_count']) && $meta['search_result_count'][0] == "50") { echo ' selected'; } ?>>50 per page</option>
                 </select>
-            <input type="hidden" name="search_status" value="publish" />
+            </div>
+            <div>
+                <h2>Include Post Types</h2>
+                <?php
+                    foreach ( $post_types as $index => $this_post ) {
+                        if ( !in_array($this_post, $unindexable_types) ) {
+                            echo '<div>';
+                            echo '<input type="checkbox" value="' . $this_post . '" name="search_result_post_types[' . $index . ']"';
+                            if ( isset($selected_post_types) && in_array($this_post, $selected_post_types) ) {
+                                echo ' checked';
+                            }
+                            echo '><label for="' . $this_post . '">' . ucfirst($this_post) . '</label>';
+                            echo '</div>';
+                        }
+                    }
+                ?>
+            </div>
+            <div>
+                <h2>Include Categories</h2>
+                <?php
+                    foreach ( $categories as $index => $this_category ) {
+                        echo '<div>';
+                        echo '<input type="checkbox" value="' . $this_category->name . '" name="search_result_post_categories[' . $index . ']"';
+                            if ( isset($selected_categories) && in_array($this_category->name, $selected_categories) ) {
+                                echo ' checked';
+                            }
+                        echo '><label for="' . $this_category->name . '">' . $this_category->name . '</label>';
+                        echo '</div>';
+                    }
+                    echo '<a href="#">Add more categories</a>';
+                ?>
+            </div>
+            <div>
+                <h2>Include Tags</h2>
+                <?php
+                    foreach ( $tags as $index => $this_tag ) {
+                        echo '<div>';
+                        echo '<input type="checkbox" value="' . $this_tag->name . '" name="search_result_post_tags[' . $index . ']"';
+                            if ( isset($selected_tags) && in_array($this_tag->name, $selected_tags) ) {
+                                echo ' checked';
+                            }
+                        echo '><label for="' . $this_tag->name . '">' . $this_tag->name . '</label>';
+                        echo '</div>';
+                    }
+                    echo '<a href="#">Add more tags</a>';
+                ?>
+            </div>
             <?php submit_button(); ?>
         </form>
     </div>

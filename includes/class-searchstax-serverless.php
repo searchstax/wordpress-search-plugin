@@ -158,14 +158,17 @@ class Searchstax_Serverless {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		
+		$this->loader->add_action( 'publish_to_draft', $plugin_admin, 'post_delete_hook', 10, 1 );
+		$this->loader->add_action( 'publish_to_trash', $plugin_admin, 'post_delete_hook', 10, 1 );
+		$this->loader->add_action( 'post_updated', $plugin_admin, 'post_edit_hook', 10, 3 );
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_filter( 'replace_editor', $plugin_admin, 'search_result_editor' );
 
 		$this->loader->add_action( 'wp_ajax_admin_check_api_status', $plugin_admin, 'check_api_status' );
 
-		$this->loader->add_action( 'post_updated', $plugin_admin, 'post_edit_hook', 10, 3 );
-		$this->loader->add_action( 'admin_post_search_result_edit', $plugin_admin, 'edit_search_result');
+		$this->loader->add_action( 'admin_post_search_result_edit', $plugin_admin, 'edit_search_result' );
 	}
 
 	/**
@@ -185,6 +188,8 @@ class Searchstax_Serverless {
 		//$this->loader->add_filter( 'the_content', $plugin_public, 'print_page' );
 
 		$this->loader->add_filter( 'template_include', $plugin_public, 'add_search_template' );
+
+		$this->loader->add_filter( 'parse_query', $plugin_public, 'add_search_intercept' );
 	}
 
 	public function register_search_page() {
