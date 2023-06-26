@@ -178,7 +178,7 @@ class Searchstax_Serverless_Admin {
 		echo '<h2>Index Status</h2>';
 
 		if ( $token != '' && $select_api != '' ) {
-			//$this->index_content();
+			$this->index_content();
 
 			$url = $select_api . '?q=*:*&wt=json&indent=true';
 			$args = array(
@@ -195,7 +195,7 @@ class Searchstax_Serverless_Admin {
 				echo 'Error';
 				echo $json['message'];
 			}
-			else {
+			elseif ( $json != null && isset($json['response']) ) {
 				echo 'Indexed Documents:' . $json['response']['numFound'] . '<br />';
 				foreach ( $json['response']['docs'] as $doc ) {
 					echo $doc['id'];
@@ -204,6 +204,10 @@ class Searchstax_Serverless_Admin {
 					}
 					echo '<br />';
 				}
+			}
+			else {
+				echo 'Unable to connect';
+				// echo var_dump($json);
 			}
 		}
 		else {
@@ -278,7 +282,7 @@ class Searchstax_Serverless_Admin {
 			foreach ( $pages as $page ) {
 				if ( $page->post_status == "publish" ) {
 					echo '<div>Adding page "' . $page->post_title . '" </div>';
-					$page_batch[] = $this->post_to_solr($page, 'page_' . $post->ID);
+					$page_batch[] = $this->post_to_solr($page, 'page_' . $page->ID);
 				}
 			}
 
