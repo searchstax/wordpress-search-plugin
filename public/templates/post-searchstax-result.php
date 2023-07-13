@@ -38,6 +38,12 @@ $start = 0;
 if ( isset($_GET['searchStart']) ) {
     $start = $_GET['searchStart'];
 }
+if ( isset($_GET['category']) ) {
+    $selected_categories = [$_GET['category']];
+}
+if ( isset($_GET['tag']) ) {
+    $selected_tags = [$_GET['tag']];
+}
 
 ?>
 
@@ -121,13 +127,21 @@ if ( isset($_GET['searchStart']) ) {
                 echo '<div class="searchstax_serverless_facet">';
                 foreach ( $categories as $category => $count) {
                     echo '<div class="searchstax_serverless_facet">';
-                    echo $category . ' (' . $count . ')';
+                    echo '<form>';
+                    echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                    echo '<input type="hidden" name="category" value="' . $category . '">';
+                    echo '<a href="#" class="searchstax_serverless_facet_link" onClick="parentNode.submit();">' . $category . ' (' . $count . ')</a>';
+                    echo '</form>';
                     echo '</div>';
                 }
                 echo '</div><div class="searchstax_serverless_facet">';
                 foreach ( $tags as $tag => $count) {
                     echo '<div class="searchstax_serverless_facet">';
-                    echo $tag . ' (' . $count . ')';
+                    echo '<form>';
+                    echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                    echo '<input type="hidden" name="tag" value="' . $tag . '">';
+                    echo '<a href="#" class="searchstax_serverless_facet_link" onClick="parentNode.submit();">' . $tag . ' (' . $count . ')</a>';
+                    echo '</form>';
                     echo '</div>';
                 }
                 echo '</div>';
@@ -139,6 +153,7 @@ if ( isset($_GET['searchStart']) ) {
                     echo '<div class="searchstax_serverless_inline">';
                 }
                 foreach ( $json['response']['docs'] as $doc ) {
+                    echo '<a href="' . $doc['url'][0] . '" class="searchstax_serverless_result_link">';
                     echo '<div class="searchstax_serverless_result">';
                     echo '<h3>' . $doc['title'][0] . '</h3>';
                     echo '<div>' . $doc['body'][0] . '</div>';
@@ -149,7 +164,11 @@ if ( isset($_GET['searchStart']) ) {
                         echo '<div>';
                         echo '<strong>Categories</strong>';
                         foreach ( $doc['categories'] as $category ) {
-                            echo $category;
+                            echo '<form class="searchstax_serverless_inline_form">';
+                            echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                            echo '<input type="hidden" name="category" value="' . $category . '">';
+                            echo '<a href="#" class="searchstax_serverless_category_link" onClick="parentNode.submit();">' . $category . '</a>';
+                            echo '</form>';
                         }
                         echo '</div>';
                     }
@@ -157,11 +176,16 @@ if ( isset($_GET['searchStart']) ) {
                         echo '<div>';
                         echo '<strong>Tags</strong>';
                         foreach ( $doc['tags'] as $tag ) {
-                            echo $tag;
+                            echo '<form class="searchstax_serverless_inline_form">';
+                            echo '<input type="hidden" name="searchQuery" value="' . $query . '">';
+                            echo '<input type="hidden" name="tag" value="' . $tag . '">';
+                            echo '<a href="#" class="searchstax_serverless_tag_link" onClick="parentNode.submit();">' . $tag . '</a>';
+                            echo '</form>';
                         }
                         echo '</div>';
                     }
                     echo '</div>';
+                    echo '</a>';
                 }
                 echo '</div>';
                 echo '<div class="searchstax_serverless_result_pagination">';

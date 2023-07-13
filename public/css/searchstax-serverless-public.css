@@ -5,6 +5,7 @@
 
 .searchstax_serverless_search_bar {
     display: flex;
+    margin: 20px 0;
 }
 
 .searchstax_serverless_search_input {
@@ -17,6 +18,19 @@
 
 .searchstax_serverless_facet {
     display: block;
+}
+
+.searchstax_serverless_facet_link {
+     background: none;
+     border: none;
+     cursor: pointer;
+}
+
+.searchstax_serverless_result_link {
+     background: none;
+     border: none;
+     text-decoration: none;
+     cursor: pointer;
 }
 
 .searchstax_serverless_results {
@@ -40,8 +54,25 @@
     border-color: #DDDDDD;
 }
 
+.searchstax_serverless_inline_form {
+    display: inline;
+}
+
+.searchstax_serverless_category_link, .searchstax_serverless_tag_link {
+    margin: 0 3px;
+}
+
 .searchstax_serverless_result_pagination {
     margin: 12px 0;
     display: grid;
     grid-template-columns: auto auto auto;
+    text-align: center;
+}
+
+.searchstax_serverless_result_pagination form:first-of-type {
+    text-align: left;
+}
+
+.searchstax_serverless_result_pagination form:last-of-type {
+    text-align: right;
 }

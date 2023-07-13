@@ -2,3 +2,79 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+.searchstax_serverless_tab_button {
+	border: solid;
+	border-width: 1px;
+	border-bottom-width: 0;
+	padding: 12px;
+}
+.searchstax_serverless_tab_button_selected {
+	border: solid;
+	border-width: 1px;
+	border-bottom-width: 0;
+	padding: 12px;
+	background-color: #CCC;
+}
+
+.searchstax_serverless_tab {
+	display: none;
+}
+
+.searchstax_serverless_tab_visible {
+	display: block;
+}
+
+.searchstax_serverless_option_frame {
+	padding: 6px;
+	border:solid;
+	border-width: 1px;
+}
+
+#searchstax_serverless_check_server_status, #searchstax_serverless_index_content_now  {
+	height: 30px;
+	border: solid;
+	border-width: 1px;
+	cursor: pointer;
+}
+
+#searchstax_serverless_status_loader, #searchstax_serverless_index_loader {
+	display: none;
+	height: 25px;
+	margin: 0 20px;
+}
+.loader, .loader:before, .loader:after {
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  animation-fill-mode: both;
+  animation: bblFadInOut 1.8s infinite ease-in-out;
+}
+
+.loader {
+  color: #999;
+  font-size: 7px;
+  position: relative;
+  text-indent: -9999em;
+  transform: translateZ(0);
+  animation-delay: -0.16s;
+  line-height: 20px;
+}
+.loader:before,
+.loader:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+.loader:before {
+  left: -1.5em;
+  animation-delay: -0.32s;
+}
+.loader:after {
+  left: 1.5em;
+}
+
+@keyframes bblFadInOut {
+  0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+  40% { box-shadow: 0 2.5em 0 0 }
+}

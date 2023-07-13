@@ -166,7 +166,8 @@ class Searchstax_Serverless {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_filter( 'replace_editor', $plugin_admin, 'search_result_editor' );
 
-		$this->loader->add_action( 'wp_ajax_admin_check_api_status', $plugin_admin, 'check_api_status' );
+		$this->loader->add_action( 'wp_ajax_check_api_status', $plugin_admin, 'check_api_status' );
+		$this->loader->add_action( 'wp_ajax_index_content_now', $plugin_admin, 'index_content_now' );
 
 		$this->loader->add_action( 'admin_post_search_result_edit', $plugin_admin, 'edit_search_result' );
 	}
