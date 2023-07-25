@@ -51,11 +51,9 @@ class Searchstax_Serverless_Admin {
 
 		$this->searchstax_serverless = $searchstax_serverless;
 		$this->version = $version;
-
 	}
 
-	public function sanitize_token( $input )
-	{
+	public function sanitize_token( $input ) {
 		return $input;
 			/*
 		$new_input = array();
@@ -89,7 +87,6 @@ class Searchstax_Serverless_Admin {
 		 */
 
 		wp_enqueue_style( $this->searchstax_serverless, plugin_dir_url( __FILE__ ) . 'css/searchstax-serverless-admin.css', array(), $this->version, 'all' );
-
 	}
 
 	/**
@@ -112,12 +109,10 @@ class Searchstax_Serverless_Admin {
 		 */
 
 		wp_enqueue_script( $this->searchstax_serverless, plugin_dir_url( __FILE__ ) . 'js/searchstax-serverless-admin.js', array( 'jquery' ), $this->version, false );
-		//wp_localize_script( $this->searchstax_serverless, $this->searchstax_serverless , array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 
 	    wp_localize_script( $this->searchstax_serverless, 'wp_ajax', array(
 	        'ajax_url' => admin_url( 'admin-ajax.php' ),
 	        '_nonce' => wp_create_nonce( 'searchstax-serverless' ),
-
 	    ) );
 	}
 
@@ -127,8 +122,8 @@ class Searchstax_Serverless_Admin {
 		 */
 
 		$this->plugin_screen_hook_suffix = add_options_page(
-			__( 'Searchstax Serverless Settings', 'searchstax-serverless' ),
-			__( 'Searchstax Serverless', 'searchstax-serverless' ),
+			__( 'SearchStax Serverless Settings', 'searchstax-serverless' ),
+			__( 'SearchStax Serverless', 'searchstax-serverless' ),
 			'manage_options',
 			'searchstax_serverless_settings',
 			array( $this, 'display_options_page' )
@@ -256,12 +251,11 @@ class Searchstax_Serverless_Admin {
 
 	    die( json_encode( $return ) );
 
-
 	}
 
-	public function check_api_status() {
+	public function get_indexed_items() {
 		/*
-		 * Handle AJAX request for checking API status
+		 * Handle AJAX request for getting indexed items
 		 */
 
         //check_ajax_referer('check_api_status', 'nonce');
@@ -274,7 +268,7 @@ class Searchstax_Serverless_Admin {
 		$select_api = get_option('searchstax_serverless_api_select');
 
 		if ( $token != '' && $select_api != '' ) {
-			$url = $select_api . '?q=*:*&wt=json&indent=true';
+			$url = $select_api . '?q=*:*&rows=10&wt=json&indent=true';
 			$args = array(
 			    'headers' => array(
 			        'Authorization' => 'Token ' . $token
@@ -291,7 +285,7 @@ class Searchstax_Serverless_Admin {
 			}
 			elseif ( $json != null && isset($json['response']) ) {
 				$return['status'] = 'success';
-				$return['data'] = 'Indexed Documents:' . $json['response']['numFound'];
+				$return['data'] = $json['response'];
 			}
 			else {
 				$return['status'] = 'failed';
@@ -306,51 +300,6 @@ class Searchstax_Serverless_Admin {
 	    wp_reset_query();
 
 	    die( json_encode( $return ) );
-	}
-
-	public function list_items() {
-		$token = get_option('searchstax_serverless_token_read');
-		$select_api = get_option('searchstax_serverless_api_select');
-
-		if ( $token != '' && $select_api != '' ) {
-			// $this->index_content();
-
-			$url = $select_api . '?q=*:*&wt=json&indent=true';
-			$args = array(
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $token
-			    )
-			);
-
-			$response = wp_remote_get( $url, $args );
-			$body = wp_remote_retrieve_body( $response );
-			$json = json_decode( $body, true );
-			
-			if (isset($json['message'])) {
-				echo 'Error - ';
-				echo $json['message'];
-			}
-			elseif ( $json != null && isset($json['response']) ) {
-				echo 'Indexed Documents: ' . $json['response']['numFound'] . '<br />';
-				echo '<table>';
-				foreach ( $json['response']['docs'] as $doc ) {
-					echo '<tr>';
-					echo '<td>' . $doc['id'] . '</td>';
-					if( isset($doc['title'][0])) {
-						echo '<td><a href="' . $doc['url'][0] . '" target="_blank">' . $doc['title'][0] . '</a></td>';
-					}
-					echo '</tr>';
-				}
-				echo '</table>';
-			}
-			else {
-				echo 'Unable to connect';
-				// echo var_dump($json);
-			}
-		}
-		else {
-			echo 'Please enter all account info';
-		}
 	}
 
 	public function post_to_solr( $post, $solr_id ) {
@@ -385,60 +334,6 @@ class Searchstax_Serverless_Admin {
 		$solrDoc['tags'] = $tags;
 
 		return $solrDoc;
-	}
-
-	public function index_content() {
-		$write_token = get_option('searchstax_serverless_token_write');
-		$update_api = get_option('searchstax_serverless_api_update');
-
-		if ( $write_token != '' && $update_api != '') {
-			$posts = get_posts();
-			$post_batch = array();
-			foreach ( $posts as $post ) {
-				if ( $post->post_status == "publish") {
-					echo '<div>Adding post "' . $post->post_title . '"</div>';
-					$post_batch[] = $this->post_to_solr($post, 'post_' . $post->ID);
-				}
-			}
-			$url = $update_api . '?commit=true';
-			$args = array(
-				'body' => json_encode($post_batch),
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $write_token,
-			        'Content-type' => 'application/json'
-			    )
-			);
-
-			$response = wp_remote_post( $url, $args );
-
-			if ( $response['response']['code'] == 200) {
-				echo 'Successfully added posts';
-			}
-
-			$pages = get_pages();
-			$page_batch = array();
-			foreach ( $pages as $page ) {
-				if ( $page->post_status == "publish" ) {
-					echo '<div>Adding page "' . $page->post_title . '" </div>';
-					$page_batch[] = $this->post_to_solr($page, 'page_' . $page->ID);
-				}
-			}
-
-			$url = $update_api . '?commit=true';
-			$args = array(
-				'body' => json_encode($page_batch),
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $write_token,
-			        'Content-type' => 'application/json'
-			    )
-			);
-
-			$response = wp_remote_post( $url, $args );
-			
-			if ( $response['response']['code'] == 200) {
-				echo 'Successfully added pages';
-			}
-		}
 	}
 
 	public function edit_search_result() {
@@ -590,75 +485,58 @@ class Searchstax_Serverless_Admin {
 		?>
 			<div class="wrap">
 				<h1>SearchStax Serverless Options</h1>
+				<a href="https://www.searchstax.com" target="_blank"><span class="searchstax_serverless_powered"></span></a>
 				<div>
-					<div>
-						<button id="searchstax_serverless_index_tab" class="searchstax_serverless_tab_button">Search Index</button>
-						<button id="searchstax_serverless_sitesearch_tab" class="searchstax_serverless_tab_button">Site-wide Search</button>
-						<button id="searchstax_serverless_account_tab" class="searchstax_serverless_tab_button">Account</button>
+					<div class="nav-tab-wrapper">
+						<button id="searchstax_serverless_index_tab" class="nav-tab nav-tab-active">Search Index</button>
+						<button id="searchstax_serverless_sitesearch_tab" class="nav-tab">Site-wide Search</button>
+						<button id="searchstax_serverless_account_tab" class="nav-tab">Account</button>
 					</div>
 					<div class="searchstax_serverless_option_frame">
+						<div id="searchstax_serverless_index" class="searchstax_serverless_tab_visible">
+							<div>
+								<?php
+    								include_once 'partials/searchstax-serverless-admin-index-table.php';
+									$table = new Searchstax_Serverless_Admin_Index_Table();
+									$table->list_table_page();
+								?>
+							</div>
+						</div>
 						<form method="post" action="options.php">
 							<?php settings_fields( 'searchstax_serverless_account' ); ?>
 							<?php do_settings_sections( 'searchstax_serverless_account' ); ?>
 							<div id="searchstax_serverless_account" class="searchstax_serverless_tab">
-								<table class="form-table">
-									<tr valign="top">
-										<th colspan="2">
-											<h3>Read</h3>
-											<p>Public token for fetching search results</p>
-										</th>
-									</tr>
-									<tr valign="top">
-										<th scope="row">Read-Only Token</th>
-										<td><input type="text" name="searchstax_serverless_token_read" value="<?php echo esc_attr( get_option('searchstax_serverless_token_read') ); ?>" /></td>
-									</tr>
-									<tr valign="top">
-										<th scope="row">Select API</th>
-										<td><input type="text" name="searchstax_serverless_api_select" value="<?php echo esc_attr( get_option('searchstax_serverless_api_select') ); ?>" /></td>
-									</tr>
-									<tr valign="top">
-										<th colspan="2">
-											<h3>Write/Update</h3>
-											<p>Admin Read/Write token for adding and updating documents</p>
-										</th>
-									</tr>
-									<tr valign="top">
-										<th scope="row">Write Token</th>
-										<td><input type="text" name="searchstax_serverless_token_write" value="<?php echo esc_attr( get_option('searchstax_serverless_token_write') ); ?>" /></td>
-									</tr>
-									<tr valign="top">
-										<th scope="row">Update API</th>
-										<td><input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" /></td>
-									</tr>
-								</table>
+								<div>
+									<h3>Read</h3>
+									<p>Public token for fetching search results</p>
+								</div>
+								<div>
+									<h4>Read-Only Token</h4>
+									<input type="text" name="searchstax_serverless_token_read" value="<?php echo esc_attr( get_option('searchstax_serverless_token_read') ); ?>" />
+								</div>
+								<div>
+									<h4>Select API</h4>
+									<input type="text" name="searchstax_serverless_api_select" value="<?php echo esc_attr( get_option('searchstax_serverless_api_select') ); ?>" />
+								</div>
+								<div>
+									<h3>Write/Update</h3>
+									<p>Admin Read/Write token for adding and updating documents</p>
+								</div>
+								<div>
+									<h4>Write Token</h4>
+									<input type="text" name="searchstax_serverless_token_write" value="<?php echo esc_attr( get_option('searchstax_serverless_token_write') ); ?>" />
+								</div>
+								<div>
+									<h4>Update API</h4>
+									<input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" />
+								</div>
 								<?php submit_button(); ?>
-							</div>
-							<div id="searchstax_serverless_index" class="searchstax_serverless_tab_visible">
-								<div>
-									<h2>Search Index Status</h2>
-									<button id="searchstax_serverless_check_server_status">
-										Check Status
-									</button>
-									<div id="searchstax_serverless_status_loader">
-										<div class="loader"></div>
-									</div>
-									<div id="searchstax_serverless_server_status_message"></div>
-								</div>
-								<h3>Indexed Items</h3>
-								<div>
-									<button id="searchstax_serverless_index_content_now">Index All Content</button>
-									<div id="searchstax_serverless_index_loader">
-										<div class="loader"></div>
-									</div>
-									<div id="searchstax_serverless_index_status_message"></div>
-								</div>
-								<div>
-									<?php $this->list_items(); ?>
-								</div>
 							</div>
 							<div id="searchstax_serverless_sitesearch" class="searchstax_serverless_tab">
 								<div>
 									<h3>Site Search Page</h3>
+									<p>Select a search result page for site-wide searches.</p>
+									<p>Any URLs that include <code>?s=</code> will show search results with this page.</p>
 									<select name="searchstax_serverless_site_search">
 										<option value="">None</option>
 										<?php

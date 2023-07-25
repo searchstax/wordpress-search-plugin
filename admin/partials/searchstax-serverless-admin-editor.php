@@ -72,7 +72,7 @@ $unindexable_types = array(
                 ?>" />
             </div>
             <div>
-                <h2>Display</h2>
+                <h2>Display Results</h2>
                 <div>
                     <input type="radio" value="display_inline" name="search_display" <?php if ( (isset($meta['search_display']) && $meta['search_display'][0] == "display_inline") || !isset($meta['search_display']) ) { echo 'checked'; } ?>/>
                     <label for="display_inline">Inline</label>
@@ -91,7 +91,7 @@ $unindexable_types = array(
                 </select>
             </div>
             <div>
-                <h2>Only Include Post Types</h2>
+                <h2>Only Show Post Types</h2>
                 <?php
                     foreach ( $post_types as $index => $this_post ) {
                         if ( !in_array($this_post, $unindexable_types) ) {
@@ -107,7 +107,7 @@ $unindexable_types = array(
                 ?>
             </div>
             <div>
-                <h2>Only Include Categories</h2>
+                <h2>Only Show Categories</h2>
                 <?php
                     foreach ( $categories as $index => $this_category ) {
                         echo '<div>';
@@ -118,11 +118,10 @@ $unindexable_types = array(
                         echo '><label for="' . $this_category->name . '">' . $this_category->name . '</label>';
                         echo '</div>';
                     }
-                    echo '<a href="#">Add more categories</a>';
                 ?>
             </div>
             <div>
-                <h2>Only Include Tags</h2>
+                <h2>Only Show Tags</h2>
                 <?php
                     foreach ( $tags as $index => $this_tag ) {
                         echo '<div>';
@@ -133,7 +132,6 @@ $unindexable_types = array(
                         echo '><label for="' . $this_tag->name . '">' . $this_tag->name . '</label>';
                         echo '</div>';
                     }
-                    echo '<a href="#">Add more tags</a>';
                 ?>
             </div>
             <?php submit_button(); ?>
