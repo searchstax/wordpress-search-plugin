@@ -112,9 +112,7 @@ if ( isset($_GET['tag']) ) {
                                 $tags[$tag] = 1;
                             }
                         }
-
                     }
-
                 }
                 echo '<div>Showing <strong>' . ($start + 1) . ' - ';
                 if ( ($start + $meta['search_result_count'][0]) > $json['response']['numFound']) {

@@ -182,7 +182,7 @@ class Indexed_Items_Table extends WP_List_Table {
             case 'post_date':
                 return $item[ $column_name ];
             case 'url':
-                return '<a href="#" target="_blank">' . $item[ $column_name ] . '</a>';
+                return '<a href="' . $item[ $column_name ] . '" target="_blank">' . $item[ $column_name ] . '</a>';
 
             default:
                 return print_r( $item, true ) ;

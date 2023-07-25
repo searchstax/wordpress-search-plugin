@@ -326,7 +326,8 @@ class Searchstax_Serverless_Admin {
 		$solrDoc['title'] = $post->post_title;
 		$solrDoc['summary'] = $post->post_excerpt;
 		$solrDoc['body'] = $post->post_content;
-		$solrDoc['url'] = $post->guid;
+		$solrDoc['guid'] = $post->guid;
+		$solrDoc['url'] = get_post_permalink($post);
 		$solrDoc['post_date'] = $post->post_date;
 		$solrDoc['post_type'] = $post->post_type;
 		$solrDoc['post_author'] = $post->post_author;
@@ -506,6 +507,9 @@ class Searchstax_Serverless_Admin {
 							<?php settings_fields( 'searchstax_serverless_account' ); ?>
 							<?php do_settings_sections( 'searchstax_serverless_account' ); ?>
 							<div id="searchstax_serverless_account" class="searchstax_serverless_tab">
+								<h3>SearchStax Serverless Account Info</h3>
+								<p>Enter your account info to start indexing your WordPress pages and posts</p>
+								<p>Don't have SearchStax Serverless account? Sign up now</p>
 								<div>
 									<h3>Read</h3>
 									<p>Public token for fetching search results</p>
