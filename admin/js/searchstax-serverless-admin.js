@@ -141,6 +141,27 @@
 				}
 			});
 		});
+
+		$('#searchstax_serverless_delete_items').click(function( event ) {
+			event.preventDefault();
+			$('#searchstax_serverless_delete_loader').css('display','inline-block');
+			$.ajax({
+				url: wp_ajax.ajax_url,
+				type: 'POST',
+				data: {
+					'action': 'delete_indexed_items'
+				},
+				success: function(data) {
+					var response = JSON.parse(data);
+					$('#searchstax_serverless_delete_loader').css('display','none');
+					location.reload();
+				},
+				error: function(errorThrown) {
+					$('#searchstax_serverless_delete_status_message').text('WordPress plugin error');
+					$('#searchstax_serverless_delete_loader').css('display','none');
+				}
+			});
+		});
 	});
 
 })( jQuery );

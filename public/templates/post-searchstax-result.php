@@ -151,15 +151,25 @@ if ( isset($_GET['tag']) ) {
                     echo '<div class="searchstax_serverless_inline">';
                 }
                 foreach ( $json['response']['docs'] as $doc ) {
-                    echo '<a href="' . $doc['url'][0] . '" class="searchstax_serverless_result_link">';
                     echo '<div class="searchstax_serverless_result">';
-                    echo '<h3>' . $doc['title'][0] . '</h3>';
-                    echo '<div>' . $doc['body'][0] . '</div>';
+                    if ( array_key_exists('thumbnail', $doc) && $doc['thumbnail'][0] !== 'false') {
+                        echo '<div class="searchstax_serverless_thumbnail_frame">';
+                        echo '<img class="searchstax_serverless_thumbnail" src="' . $doc['thumbnail'][0] . '">';
+                        echo '</div>';
+                    }
+                    echo '<div class="searchstax_serverless_snippet">';
+                    echo '<h3><a href="' . $doc['url'][0] . '" class="searchstax_serverless_result_link">' . $doc['title'][0] . '</a></h3>';
+                    if ( array_key_exists('summary', $doc) ) {
+                        echo '<div>' . $doc['summary'][0] . '</div>';
+                    }
+                    else {
+                        echo '<div>' . substr( wp_strip_all_tags( $doc['body'][0], true ), 0, 300 ) . '</div>';
+                    }
                     if ( array_key_exists('url', $doc) ) {
                         echo '<div><a href="' . $doc['url'][0] . '">' . $doc['url'][0] . '</a></div>';
                     }
                     if ( array_key_exists('categories', $doc) ) {
-                        echo '<div>';
+                        echo '<div class="searchstax_serverless_result_sublink">';
                         echo '<strong>Categories</strong>';
                         foreach ( $doc['categories'] as $category ) {
                             echo '<form class="searchstax_serverless_inline_form">';
@@ -171,7 +181,7 @@ if ( isset($_GET['tag']) ) {
                         echo '</div>';
                     }
                     if ( array_key_exists('tags', $doc) ) {
-                        echo '<div>';
+                        echo '<div class="searchstax_serverless_result_sublink">';
                         echo '<strong>Tags</strong>';
                         foreach ( $doc['tags'] as $tag ) {
                             echo '<form class="searchstax_serverless_inline_form">';
@@ -183,7 +193,7 @@ if ( isset($_GET['tag']) ) {
                         echo '</div>';
                     }
                     echo '</div>';
-                    echo '</a>';
+                    echo '</div>';
                 }
                 echo '</div>';
                 echo '<div class="searchstax_serverless_result_pagination">';

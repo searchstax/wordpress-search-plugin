@@ -33,14 +33,14 @@
 	cursor: pointer;
 }
 
-#searchstax_serverless_index_content_now, #searchstax_serverless_get_indexed_items  {
+#searchstax_serverless_index_content_now, #searchstax_serverless_get_indexed_items, #searchstax_serverless_delete_items  {
 	height: 30px;
 	border: solid;
 	border-width: 1px;
 	cursor: pointer;
 }
 
-#searchstax_serverless_index_loader, #searchstax_serverless_indexed_loader {
+#searchstax_serverless_index_loader, #searchstax_serverless_indexed_loader, #searchstax_serverless_delete_loader {
 	display: none;
 	margin: 0 10px;
 }

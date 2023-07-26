@@ -37,9 +37,18 @@ class Searchstax_Serverless_Admin_Index_Table {
                                 <div class="loader"></div>
                             </div>
                         </button>
-                        <div id="searchstax_serverless_indexed_status_message"></div>
+                    </span>
+                    <span>
+                        <button id="searchstax_serverless_delete_items" class="button">
+                            Delete All Content from Index
+                            <div id="searchstax_serverless_delete_loader">
+                                <div class="loader"></div>
+                            </div>
+                        </button>
                     </span>
                 </div>
+                <div id="searchstax_serverless_indexed_status_message"></div>
+                <div id="searchstax_serverless_delete_status_message"></div>
                 <?php $indexed_items->display(); ?>
             </div>
         <?php
@@ -92,7 +101,6 @@ class Indexed_Items_Table extends WP_List_Table {
      */
     public function get_columns() {
         $columns = array(
-            'id' => 'ID',
             'title' => 'Title',
             'url' => 'URL',
             'post_date' => 'Post Date'
@@ -107,7 +115,11 @@ class Indexed_Items_Table extends WP_List_Table {
      * @return Array
      */
     public function get_hidden_columns() {
-        return array();
+        $columns = array(
+            'id' => 'ID'
+        );
+
+        return $columns;
     }
 
     /**
@@ -179,8 +191,9 @@ class Indexed_Items_Table extends WP_List_Table {
         switch( $column_name ) {
             case 'id':
             case 'title':
-            case 'post_date':
                 return $item[ $column_name ];
+            case 'post_date':
+                return wp_date( get_option( 'date_format' ) , strtotime($item[ $column_name ]));
             case 'url':
                 return '<a href="' . $item[ $column_name ] . '" target="_blank">' . $item[ $column_name ] . '</a>';
 

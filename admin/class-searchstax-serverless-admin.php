@@ -187,12 +187,22 @@ class Searchstax_Serverless_Admin {
 		$update_api = get_option('searchstax_serverless_api_update');
 
 		if ( $write_token != '' && $update_api != '') {
-			$posts = get_posts();
 			$post_batch = array();
+			$posts = get_posts([
+			  'post_status' => 'publish',
+			  'numberposts' => -1
+			]);
 			foreach ( $posts as $post ) {
-				if ( $post->post_status == "publish") {
-					$post_batch[] = $this->post_to_solr($post, 'post_' . $post->ID);
-				}
+				$post_batch[] = $this->post_to_solr($post, $post->post_type . '_' . $post->ID);
+			}
+			
+			$posts = get_posts([
+			  'post_type' => 'custom',
+			  'post_status' => 'publish',
+			  'numberposts' => -1
+			]);
+			foreach ( $posts as $post ) {
+				$post_batch[] = $this->post_to_solr($post, $post->post_type . '_' . $post->ID);
 			}
 			$url = $update_api . '?commit=true';
 			$args = array(
@@ -248,7 +258,6 @@ class Searchstax_Serverless_Admin {
 		}
 
 	    wp_reset_query();
-
 	    die( json_encode( $return ) );
 
 	}
@@ -298,7 +307,57 @@ class Searchstax_Serverless_Admin {
 		}
 
 	    wp_reset_query();
+	    die( json_encode( $return ) );
+	}
 
+	public function delete_indexed_items() {
+		/*
+		 * Handle AJAX request for deleting indexed items
+		 */
+
+        //check_ajax_referer('check_api_status', 'nonce');
+
+	    $return = array();
+	    $return['status'] = 'none';
+	    $return['data'] = array();
+
+		$write_token = get_option('searchstax_serverless_token_write');
+		$update_api = get_option('searchstax_serverless_api_update');
+
+		if ( $write_token != '' && $update_api != '' ) {
+			
+			$url = $update_api . '?commit=true';
+			$args = array(
+				'body' => '{"delete": {"query": "*:*"}}',
+			    'headers' => array(
+			        'Authorization' => 'Token ' . $write_token,
+			        'Content-type' => 'application/json'
+			    )
+			);
+
+			$response = wp_remote_post( $url, $args );
+			$body = wp_remote_retrieve_body( $response );
+			$json = json_decode( $body, true );
+			
+			if (isset($json['message'])) {
+				$return['status'] = 'failed';
+				$return['data'] = $json['message'];
+			}
+			elseif ( $json != null && isset($json['response']) ) {
+				$return['status'] = 'success';
+				$return['data'] = $json['response'];
+			}
+			else {
+				$return['status'] = 'failed';
+				$return['data'] = 'Unable to connect';
+			}
+		}
+		else {
+			$return['status'] = 'failed';
+			$return['data'] = 'Please enter all account info';
+		}
+
+	    wp_reset_query();
 	    die( json_encode( $return ) );
 	}
 
@@ -326,8 +385,9 @@ class Searchstax_Serverless_Admin {
 		$solrDoc['title'] = $post->post_title;
 		$solrDoc['summary'] = $post->post_excerpt;
 		$solrDoc['body'] = $post->post_content;
+		$solrDoc['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );
 		$solrDoc['guid'] = $post->guid;
-		$solrDoc['url'] = get_post_permalink($post);
+		$solrDoc['url'] = get_permalink($post);
 		$solrDoc['post_date'] = $post->post_date;
 		$solrDoc['post_type'] = $post->post_type;
 		$solrDoc['post_author'] = $post->post_author;
@@ -445,7 +505,6 @@ class Searchstax_Serverless_Admin {
 		$update_api = get_option('searchstax_serverless_api_update');
 
 		if ( $write_token != '' && $update_api != '' && ($post->post_type == 'page' || $post->post_type == 'post') ) {
-			
 			$url = $update_api . '?commit=true';
 			$args = array(
 				'body' => '{"delete":"' . $post->post_type . '_' . $post->ID . '"}',
@@ -509,7 +568,7 @@ class Searchstax_Serverless_Admin {
 							<div id="searchstax_serverless_account" class="searchstax_serverless_tab">
 								<h3>SearchStax Serverless Account Info</h3>
 								<p>Enter your account info to start indexing your WordPress pages and posts</p>
-								<p>Don't have SearchStax Serverless account? Sign up now</p>
+								<p>Don't have SearchStax Serverless account? <a href="https://www.searchstax.com/managed-solr/serverless/" target="_blank">Sign up now</a></p>
 								<div>
 									<h3>Read</h3>
 									<p>Public token for fetching search results</p>

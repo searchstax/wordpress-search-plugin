@@ -168,6 +168,7 @@ class Searchstax_Serverless {
 
 		$this->loader->add_action( 'wp_ajax_index_content_now', $plugin_admin, 'index_content_now' );
 		$this->loader->add_action( 'wp_ajax_get_indexed_items', $plugin_admin, 'get_indexed_items' );
+		$this->loader->add_action( 'wp_ajax_delete_indexed_items', $plugin_admin, 'delete_indexed_items' );
 
 		$this->loader->add_action( 'admin_post_search_result_edit', $plugin_admin, 'edit_search_result' );
 	}
