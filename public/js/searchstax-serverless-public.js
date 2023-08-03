@@ -37,6 +37,7 @@
 			var query = $('#searchstax_serverless_dynamic_search_input').val();
 			if (query == '' && urlParams.get('searchQuery')) {
 				query = urlParams.get('searchQuery');
+				$('#searchstax_serverless_dynamic_search_input').val(query);
 			}
 			
 			if (urlParams.get('start')) {
@@ -118,7 +119,7 @@
 					        $('#searchstax_serverless_result_dynamic_pagination').empty();
 					        $('#searchstax_serverless_result_dynamic_pagination').append(
 					        	$('<button>')
-					        		.text('Back')
+					        		.text('Previous')
 					        		.addClass('button')
 					        		.click(function() {
 										get_search_results({start: Number(params.start) - Number(response['config'])})
@@ -148,7 +149,9 @@
 												response['facet_counts']['facet_fields']['post_type'][i] + ' ('
 												+ response['facet_counts']['facet_fields']['post_type'][i + 1] + ')')
 												.addClass('searchstax_serverless_facet_link')
-												.click(function() {
+												.attr('href','#')
+												.click(function(event) {
+													event.preventDefault();
 													get_search_results({start: 0, post_type: response['facet_counts']['facet_fields']['post_type'][i]})
 												})
 										)
@@ -169,7 +172,9 @@
 												response['facet_counts']['facet_fields']['categories'][i] + ' ('
 												+ response['facet_counts']['facet_fields']['categories'][i + 1] + ')')
 												.addClass('searchstax_serverless_facet_link')
-												.click(function() {
+												.attr('href','#')
+												.click(function(event) {
+													event.preventDefault();
 													get_search_results({start: 0, category: response['facet_counts']['facet_fields']['categories'][i]})
 												})
 										)
@@ -190,7 +195,9 @@
 												response['facet_counts']['facet_fields']['tags'][i] + ' ('
 												+ response['facet_counts']['facet_fields']['tags'][i + 1] + ')')
 												.addClass('searchstax_serverless_facet_link')
-												.click(function() {
+												.attr('href','#')
+												.click(function(event) {
+													event.preventDefault();
 													get_search_results({start: 0, tag: response['facet_counts']['facet_fields']['tags'][i]})
 												})
 										)

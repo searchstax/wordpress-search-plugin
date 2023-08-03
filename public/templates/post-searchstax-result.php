@@ -55,7 +55,7 @@ if ( $meta['search_config'][0] == 'config_static' ) {
         <div>
             <form action="">
                 <div class="searchstax_serverless_search_bar">
-                    <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php $query; ?>" autocomplete="off" />
+                    <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php echo $query; ?>" autocomplete="off" />
                     <input class="searchstax_serverless_search_submit" type="submit" value="Search" />
                 </div>
             </form>
@@ -264,7 +264,7 @@ if ( $meta['search_config'][0] == 'config_dynamic' ) {
                     <input id="searchstax_serverless_dynamic_search_input" class="searchstax_serverless_search_input" type="text" name="searchQuery" autocomplete="off" />
                     <button id="searchstax_serverless_dynamic_search_submit" class="searchstax_serverless_search_submit" type="submit">
                         <div id="searchstax_serverless_dynamic_label">
-                            Submit
+                            Search
                         </div>
                         <div id="searchstax_serverless_dynamic_loader">
                             <div class="searchstax_serverless_loader"></div>
