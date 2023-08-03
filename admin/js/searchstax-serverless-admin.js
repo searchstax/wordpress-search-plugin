@@ -133,7 +133,16 @@
 				success: function(data) {
 					var response = JSON.parse(data);
 					$('#searchstax_serverless_index_loader').css('display','none');
-					location.reload();
+					if ( response['status'] === 'success' ) {
+						$('#searchstax_serverless_index_status_message').text('Indexing complete');
+						location.reload();
+					}
+					else {
+						$('#searchstax_serverless_index_status_message').text(response['status']);
+						setTimeout(function() {
+							location.reload();
+						}, 5000);
+					}
 				},
 				error: function(errorThrown) {
 					$('#searchstax_serverless_index_status_message').text('WordPress plugin error');
@@ -151,6 +160,7 @@
 				data: {
 					'action': 'delete_indexed_items'
 				},
+				timeout: 100,
 				success: function(data) {
 					var response = JSON.parse(data);
 					$('#searchstax_serverless_delete_loader').css('display','none');

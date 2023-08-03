@@ -165,10 +165,12 @@ class Searchstax_Serverless {
 
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_filter( 'replace_editor', $plugin_admin, 'search_result_editor' );
+		$this->loader->add_filter( 'update_option_searchstax_serverless_token_write', $plugin_admin, 'update_schema' );
 
 		$this->loader->add_action( 'wp_ajax_index_content_now', $plugin_admin, 'index_content_now' );
 		$this->loader->add_action( 'wp_ajax_get_indexed_items', $plugin_admin, 'get_indexed_items' );
 		$this->loader->add_action( 'wp_ajax_delete_indexed_items', $plugin_admin, 'delete_indexed_items' );
+		$this->loader->add_action( 'wp_ajax_get_search_results', $plugin_admin, 'get_search_results_admin' );
 
 		$this->loader->add_action( 'admin_post_search_result_edit', $plugin_admin, 'edit_search_result' );
 	}
@@ -187,11 +189,10 @@ class Searchstax_Serverless {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-		//$this->loader->add_filter( 'the_content', $plugin_public, 'print_page' );
-
 		$this->loader->add_filter( 'template_include', $plugin_public, 'add_search_template' );
-
 		$this->loader->add_filter( 'parse_query', $plugin_public, 'add_search_intercept' );
+
+		$this->loader->add_action( 'wp_ajax_nopriv_get_search_results', $plugin_public, 'get_search_results' );
 	}
 
 	public function register_search_page() {

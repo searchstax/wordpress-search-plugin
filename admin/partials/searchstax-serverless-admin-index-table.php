@@ -34,7 +34,7 @@ class Searchstax_Serverless_Admin_Index_Table {
                         <button id="searchstax_serverless_index_content_now" class="button">
                             Index All Content
                             <div id="searchstax_serverless_index_loader">
-                                <div class="loader"></div>
+                                <div class="searchstax_serverless_loader"></div>
                             </div>
                         </button>
                     </span>
@@ -42,11 +42,12 @@ class Searchstax_Serverless_Admin_Index_Table {
                         <button id="searchstax_serverless_delete_items" class="button">
                             Delete All Content from Index
                             <div id="searchstax_serverless_delete_loader">
-                                <div class="loader"></div>
+                                <div class="searchstax_serverless_loader"></div>
                             </div>
                         </button>
                     </span>
                 </div>
+                <div id="searchstax_serverless_index_status_message"></div>
                 <div id="searchstax_serverless_indexed_status_message"></div>
                 <div id="searchstax_serverless_delete_status_message"></div>
                 <?php $indexed_items->display(); ?>
@@ -147,8 +148,18 @@ class Indexed_Items_Table extends WP_List_Table {
 
         if ( $token != '' && $select_api != '' ) {
             $url = $select_api . '?q=*:*';
+            $url .= '&fl=id,title,thumbnail,url,summary,post_type,categories,tags,post_date';
             $url .= '&start=' . ($this->index_start_page - 1) * $this->index_row_count;
             $url .= '&rows=' . $this->index_row_count;
+            if(!empty($_GET['orderby'])) {
+                $url .= '&sort=' . $_GET['orderby'];
+                if(!empty($_GET['order'])) {
+                    $url .= ' ' . $_GET['order'];
+                }
+                else {
+                    $url .= ' asc';
+                }
+            }
             $url .= '&wt=json';
             $args = array(
                 'headers' => array(
@@ -169,8 +180,8 @@ class Indexed_Items_Table extends WP_List_Table {
                 foreach ( $json['response']['docs'] as $this_doc) {
                     $data[] = array(
                         'id' => $this_doc['id'],
-                        'title' => $this_doc['title'][0],
-                        'url' => $this_doc['url'][0],
+                        'title' => $this_doc['title'],
+                        'url' => $this_doc['url'],
                         'post_date' => $this_doc['post_date'][0]
                     );
                 }
@@ -213,8 +224,7 @@ class Indexed_Items_Table extends WP_List_Table {
         $order = 'asc';
 
         // If orderby is set, use this as the sort column
-        if(!empty($_GET['orderby']))
-        {
+        if(!empty($_GET['orderby'])) {
             $orderby = $_GET['orderby'];
         }
 

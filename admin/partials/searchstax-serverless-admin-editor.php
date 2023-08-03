@@ -21,8 +21,14 @@ require_once ABSPATH . 'wp-admin/admin-header.php';
 $post = $GLOBALS['post'];
 $meta = get_post_meta($post->ID);
 $post_types = get_post_types();
-$categories = get_categories();
-$tags = get_tags();
+$categories = get_categories(array(
+    'orderby' => 'name'
+));
+$tags = get_tags(array(
+    'orderby' => 'name'
+));
+
+sort($post_types);
 
 $selected_post_types = array();
 $selected_categories = array();
@@ -72,6 +78,17 @@ $unindexable_types = array(
                 ?>" />
             </div>
             <div>
+                <h2>Result Config</h2>
+                <div>
+                    <input type="radio" value="config_static" name="search_config" <?php if ( (isset($meta['search_config']) && $meta['search_config'][0] == "config_static") || !isset($meta['search_config']) ) { echo 'checked'; } ?>/>
+                    <label for="config_static">Static</label>
+                </div>
+                <div>
+                    <input type="radio" value="config_dynamic" name="search_config"  <?php if ( isset($meta['search_config']) && $meta['search_config'][0] == "config_dynamic") { echo 'checked'; } ?>/>
+                    <label for="config_dynamic">AJAX/Dynamic</label>
+                </div>
+            </div>
+            <div>
                 <h2>Display Results</h2>
                 <div>
                     <input type="radio" value="display_inline" name="search_display" <?php if ( (isset($meta['search_display']) && $meta['search_display'][0] == "display_inline") || !isset($meta['search_display']) ) { echo 'checked'; } ?>/>
@@ -92,6 +109,7 @@ $unindexable_types = array(
             </div>
             <div>
                 <h2>Only Show Post Types</h2>
+                <div class="searchstax_serverless_scroll_container">
                 <?php
                     foreach ( $post_types as $index => $this_post ) {
                         if ( !in_array($this_post, $unindexable_types) ) {
@@ -105,9 +123,11 @@ $unindexable_types = array(
                         }
                     }
                 ?>
+                </div>
             </div>
             <div>
                 <h2>Only Show Categories</h2>
+                <div class="searchstax_serverless_scroll_container">
                 <?php
                     foreach ( $categories as $index => $this_category ) {
                         echo '<div>';
@@ -119,9 +139,11 @@ $unindexable_types = array(
                         echo '</div>';
                     }
                 ?>
+                </div>
             </div>
             <div>
                 <h2>Only Show Tags</h2>
+                <div class="searchstax_serverless_scroll_container">
                 <?php
                     foreach ( $tags as $index => $this_tag ) {
                         echo '<div>';
@@ -133,6 +155,7 @@ $unindexable_types = array(
                         echo '</div>';
                     }
                 ?>
+                </div>
             </div>
             <?php submit_button(); ?>
         </form>

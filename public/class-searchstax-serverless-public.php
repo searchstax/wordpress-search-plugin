@@ -98,6 +98,10 @@ class Searchstax_Serverless_Public {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/searchstax-serverless-public.js', array( 'jquery' ), $this->version, false );
 
+	    wp_localize_script( $this->plugin_name, 'frontend_wp_ajax', array(
+	        'ajax_url' => admin_url( 'admin-ajax.php' ),
+	        '_nonce' => wp_create_nonce( 'searchstax-serverless' ),
+	    ) );
 	}
 
 	public function add_search_template( $template ) {
@@ -122,6 +126,101 @@ class Searchstax_Serverless_Public {
 			exit;
 			die();
 		}
+	}
+
+	public function get_search_results() {
+		/*
+		 * Handle AJAX request for getting search results
+		 */
+
+        //check_ajax_referer('check_api_status', 'nonce');
+
+	    $return = array();
+	    $return['status'] = 'none';
+	    $return['data'] = array();
+
+		$token = get_option('searchstax_serverless_token_read');
+		$select_api = get_option('searchstax_serverless_api_select');
+
+		$query = $_POST['q'];
+		$post_ID = $_POST['post_id'];
+
+        if ( $query != '' && $post_ID != '' && $token != '' && $select_api != '' ) {
+		
+		    $selected_post_types = get_post_meta($post_ID, 'search_result_post_types', true);
+		    $selected_categories = get_post_meta($post_ID, 'search_result_post_categories', true);
+		    $selected_tags = get_post_meta($post_ID, 'search_result_post_tags', true);
+
+		    $start = 0;
+		    if ( isset($_POST['searchStart']) ) {
+		        $start = $_POST['searchStart'];
+		    }
+		    if ( isset($_POST['post_type']) && $_POST['post_type'] != '') {
+		        $selected_post_types = [$_POST['post_type']];
+		    }
+		    if ( isset($_POST['category']) && $_POST['category'] != '' ) {
+		        $selected_categories = [$_POST['category']];
+		    }
+		    if ( isset($_POST['tag']) && $_POST['tag'] != '' ) {
+		        $selected_tags = [$_POST['tag']];
+		    }
+			$meta = get_post_meta($post_ID);
+
+            $url = $select_api . '?q=(body:*' . $query . '* OR title:*' . $query . '*)';
+            if ( count($selected_post_types) > 0 ) {
+                $url .= '&fq=post_type:("' . join('" OR "', $selected_post_types) . '")';
+            }
+            if ( count($selected_categories) > 0 ) {
+                $url .= '&fq=categories:("' . join('" OR "', $selected_categories) . '")';
+            }
+            if ( count($selected_tags) > 0 ) {
+                $url .= '&fq=tags:("' . join('" OR "', $selected_tags) . '")';
+            }
+            $url .= '&fl=id,title,thumbnail,url,summary,post_type,categories,tags';
+            $url .= '&start=' . $start;
+            $url .= '&rows=' . $meta['search_result_count'][0];
+            $url .= '&facet=true';
+            $url .= '&facet.mincount=1';
+            $url .= '&facet.field=categories';
+            $url .= '&facet.field=tags';
+            $url .= '&facet.field=post_type';
+            $url .= '&f.categories.facet.sort=index';
+            $url .= '&f.tags.facet.sort=index';
+            $url .= '&f.post_type.facet.sort=index';
+            $url .= '&wt=json';
+			$args = array(
+			    'headers' => array(
+			        'Authorization' => 'Token ' . $token
+			    )
+			);
+
+			$response = wp_remote_get( $url, $args );
+			$body = wp_remote_retrieve_body( $response );
+			$json = json_decode( $body, true );
+			
+			if (isset($json['message'])) {
+				$return['status'] = 'failed';
+				$return['data'] = $json['message'];
+			}
+			elseif ( $json != null && isset($json['response']) ) {
+				$return['status'] = 'success';
+				$return['data'] = $json['response'];
+				$return['config'] = $meta['search_result_count'][0];
+				$return['facet_counts'] = $json['facet_counts'];
+				$return['url'] = $url;
+			}
+			else {
+				$return['status'] = 'failed';
+				$return['data'] = 'Unable to connect';
+			}
+		}
+		else {
+			$return['status'] = 'failed';
+			$return['data'] = 'Please enter all account info';
+		}
+
+	    wp_reset_query();
+	    die( json_encode( $return ) );
 	}
 
 }

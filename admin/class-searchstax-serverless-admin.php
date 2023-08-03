@@ -47,24 +47,18 @@ class Searchstax_Serverless_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $searchstax_serverless, $version ) {
+	public function __construct( $plugin_name, $version ) {
 
-		$this->searchstax_serverless = $searchstax_serverless;
+		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 	}
 
 	public function sanitize_token( $input ) {
-		return $input;
-			/*
-		$new_input = array();
-		if( isset( $input['id_number'] ) )
-			$new_input['id_number'] = absint( $input['id_number'] );
+		return sanitize_text_field( trim( $input ) );
+	}
 
-		if( isset( $input['title'] ) )
-			$new_input['title'] = sanitize_text_field( $input['title'] );
-
-		return $new_input;
-		*/
+	public function sanitize_url( $input ) {
+		return filter_var( trim( $input ), FILTER_SANITIZE_URL );
 	}
 
 	/**
@@ -86,7 +80,7 @@ class Searchstax_Serverless_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->searchstax_serverless, plugin_dir_url( __FILE__ ) . 'css/searchstax-serverless-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/searchstax-serverless-admin.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -108,9 +102,9 @@ class Searchstax_Serverless_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->searchstax_serverless, plugin_dir_url( __FILE__ ) . 'js/searchstax-serverless-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/searchstax-serverless-admin.js', array( 'jquery' ), $this->version, false );
 
-	    wp_localize_script( $this->searchstax_serverless, 'wp_ajax', array(
+	    wp_localize_script( $this->plugin_name, 'wp_ajax', array(
 	        'ajax_url' => admin_url( 'admin-ajax.php' ),
 	        '_nonce' => wp_create_nonce( 'searchstax-serverless' ),
 	    ) );
@@ -144,13 +138,13 @@ class Searchstax_Serverless_Admin {
 		register_setting(
 			'searchstax_serverless_account',
 			'searchstax_serverless_api_select',
-			array( $this, 'sanitize_token' )
+			array( $this, 'sanitize_url' )
 		);
 
 		register_setting(
 			'searchstax_serverless_account',
 			'searchstax_serverless_api_update',
-			array( $this, 'sanitize_token' )
+			array( $this, 'sanitize_url' )
 		);
 
 		register_setting(
@@ -172,6 +166,105 @@ class Searchstax_Serverless_Admin {
 		return false;
 	}
 
+	public function update_schema() {
+		/*
+		 * Update Solr schema for WordPress fields
+		 */
+
+		$write_token = get_option('searchstax_serverless_token_write');
+		$update_api = get_option('searchstax_serverless_api_update');
+
+		if ( $write_token != '' && $update_api != '') {
+			$url = str_replace("update", "", $update_api) . 'schema';
+			$args = array(
+				'body' => '{
+					"add-field": {
+						"name": "title",
+						"type": "string",
+						"indexed": true,
+						"required": false,
+						"stored": true,
+						"multiValued": false
+					},
+					"add-field": {
+						"name": "url",
+						"type": "string",
+						"indexed": true,
+						"required": false,
+						"stored": true,
+						"multiValued": false
+					},
+					"add-field": {
+						"name": "tags",
+						"type": "string",
+						"indexed": true,
+						"required": false,
+						"stored": true,
+						"multiValued": true
+					},
+					"add-field": {
+						"name": "categories",
+						"type": "string",
+						"indexed": true,
+						"required": false,
+						"stored": true,
+						"multiValued": true
+					},
+					"add-field": {
+						"name": "post_type",
+						"type": "string",
+						"indexed": true,
+						"required": false,
+						"stored": true,
+						"multiValued": true
+					}
+				}',
+			    'headers' => array(
+			        'Authorization' => 'Token ' . $write_token,
+			        'Content-type' => 'application/json'
+			    )
+			);
+
+			$response = wp_remote_post( $url, $args );
+		}
+	}
+
+	public function push_to_solr( $docs ) {
+	    $return = array();
+	    $return['status'] = 'none';
+	    $return['data'] = array();
+
+		$write_token = get_option('searchstax_serverless_token_write');
+		$update_api = get_option('searchstax_serverless_api_update');
+
+		if ( $write_token != '' && $update_api != '' ) {
+			$url = $update_api . '?commit=true';
+			$args = array(
+				'body' => json_encode( $docs ),
+			    'headers' => array(
+			        'Authorization' => 'Token ' . $write_token,
+			        'Content-type' => 'application/json'
+			    )
+			);
+
+			$response = wp_remote_post( $url, $args );
+
+			if ( $response['response']['code'] == 200) {
+				$return['status'] = 'success';
+				$doc_ids = array();
+				foreach ( $docs as $doc ) {
+					$doc_ids[] = $doc->ID;
+				}
+				$return['data'] = $doc_ids;
+			}
+			else {
+				$return['status'] = 'failed';
+				$return['data'] = 'Unable to connect';
+			}
+		}
+		return $return;
+	}
+
 	public function index_content_now() {
 		/*
 		 * Handle AJAX request to index all WordPress content
@@ -186,71 +279,67 @@ class Searchstax_Serverless_Admin {
 		$write_token = get_option('searchstax_serverless_token_write');
 		$update_api = get_option('searchstax_serverless_api_update');
 
-		if ( $write_token != '' && $update_api != '') {
+		if ( $write_token != '' && $update_api != '' ) {
 			$post_batch = array();
+
 			$posts = get_posts([
 			  'post_status' => 'publish',
 			  'numberposts' => -1
 			]);
-			foreach ( $posts as $post ) {
-				$post_batch[] = $this->post_to_solr($post, $post->post_type . '_' . $post->ID);
-			}
 			
-			$posts = get_posts([
+			$custom_posts = get_posts([
 			  'post_type' => 'custom',
 			  'post_status' => 'publish',
 			  'numberposts' => -1
 			]);
+
+			$pages = get_pages([
+			  'post_type' => 'page',
+			  'post_status' => 'publish',
+			  'numberposts' => -1
+			]);
+
 			foreach ( $posts as $post ) {
-				$post_batch[] = $this->post_to_solr($post, $post->post_type . '_' . $post->ID);
+				$post_batch[] = $this->post_to_solr_json($post, $post->post_type . '_' . $post->ID);
 			}
-			$url = $update_api . '?commit=true';
-			$args = array(
-				'body' => json_encode($post_batch),
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $write_token,
-			        'Content-type' => 'application/json'
-			    )
-			);
 
-			$response = wp_remote_post( $url, $args );
+			foreach ( $custom_posts as $post ) {
+				$post_batch[] = $this->post_to_solr_json($post, $post->post_type . '_' . $post->ID);
+			}
 
-			if ( $response['response']['code'] == 200) {
+			foreach ( $pages as $post ) {
+				$post_batch[] = $this->post_to_solr_json($post, $post->post_type . '_' . $post->ID);
+			}
+
+	    	$batch_size = 20;
+	    	$pages = ceil(count($post_batch) / $batch_size);
+	    	$timeout = time() + 30;
+	    	$delay = 250;
+	    	$data = array();
+
+	    	for ( $i = 0; $i < $pages; $i++ ) {
+	    		$status = $this->push_to_solr( array_slice( $post_batch, $i * $batch_size, $batch_size ) );
+
+	    		if ( $status['status'] == 'success' ) {
+	    			$data = array_merge( $data, $status['data'] );
+	    		}
+	    		else {
+	    			$return['status'] = $status['status'];
+	    			break;
+	    		}
+
+	    		if ( time() > $timeout ) {
+	    			$return['status'] = 'timeout';
+	    			break;
+	    		}
+	    		set_time_limit(20);
+	    		usleep( $delay );
+	    	}
+
+	    	if ( $return['status'] == 'none' ) {
 				$return['status'] = 'success';
-				$return['data']['posts'] = 'Successfully indexed ' . count($post_batch) . ' posts';
-			}
-			else {
-				$return['status'] = 'failed';
-				$return['data'] = 'Unable to connect';
-			}
-
-			$pages = get_pages();
-			$page_batch = array();
-			foreach ( $pages as $page ) {
-				if ( $page->post_status == "publish" ) {
-					$page_batch[] = $this->post_to_solr($page, 'page_' . $page->ID);
-				}
-			}
-
-			$url = $update_api . '?commit=true';
-			$args = array(
-				'body' => json_encode($page_batch),
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $write_token,
-			        'Content-type' => 'application/json'
-			    )
-			);
-
-			$response = wp_remote_post( $url, $args );
-			
-			if ( $response['response']['code'] == 200) {
-				$return['status'] = 'success';
-				$return['data']['pages'] = 'Successfully indexed ' . count($page_batch) . ' pages';
-			}
-			else {
-				$return['status'] = 'failed';
-				$return['data'] = 'Unable to connect';
-			}
+				$return['data']['posts'] = 'Successfully indexed ' . count($data) . ' items';
+	    	}
 		}
 		else {
 			$return['status'] = 'failed';
@@ -259,7 +348,6 @@ class Searchstax_Serverless_Admin {
 
 	    wp_reset_query();
 	    die( json_encode( $return ) );
-
 	}
 
 	public function get_indexed_items() {
@@ -295,6 +383,103 @@ class Searchstax_Serverless_Admin {
 			elseif ( $json != null && isset($json['response']) ) {
 				$return['status'] = 'success';
 				$return['data'] = $json['response'];
+			}
+			else {
+				$return['status'] = 'failed';
+				$return['data'] = 'Unable to connect';
+			}
+		}
+		else {
+			$return['status'] = 'failed';
+			$return['data'] = 'Please enter all account info';
+		}
+
+	    wp_reset_query();
+	    die( json_encode( $return ) );
+	}
+
+	public function get_search_results_admin() {
+		/*
+		 * Handle AJAX request for getting search results
+		 *
+		 * This is currently  duplicate of the public function needed for separate public/admin enqueueing
+		 */
+
+        //check_ajax_referer('check_api_status', 'nonce');
+
+	    $return = array();
+	    $return['status'] = 'none';
+	    $return['data'] = array();
+
+		$token = get_option('searchstax_serverless_token_read');
+		$select_api = get_option('searchstax_serverless_api_select');
+
+		$query = $_POST['q'];
+		$post_ID = $_POST['post_id'];
+
+        if ( $query != '' && $post_ID != '' && $token != '' && $select_api != '' ) {
+		
+		    $selected_post_types = get_post_meta($post_ID, 'search_result_post_types', true);
+		    $selected_categories = get_post_meta($post_ID, 'search_result_post_categories', true);
+		    $selected_tags = get_post_meta($post_ID, 'search_result_post_tags', true);
+
+		    $start = 0;
+		    if ( isset($_POST['searchStart']) ) {
+		        $start = $_POST['searchStart'];
+		    }
+		    if ( isset($_POST['post_type']) && $_POST['post_type'] != '') {
+		        $selected_post_types = [$_POST['post_type']];
+		    }
+		    if ( isset($_POST['category']) && $_POST['category'] != '' ) {
+		        $selected_categories = [$_POST['category']];
+		    }
+		    if ( isset($_POST['tag']) && $_POST['tag'] != '' ) {
+		        $selected_tags = [$_POST['tag']];
+		    }
+			$meta = get_post_meta($post_ID);
+
+            $url = $select_api . '?q=(body:*' . $query . '* OR title:*' . $query . '*)';
+            if ( count($selected_post_types) > 0 ) {
+                $url .= '&fq=post_type:("' . join('" OR "', $selected_post_types) . '")';
+            }
+            if ( count($selected_categories) > 0 ) {
+                $url .= '&fq=categories:("' . join('" OR "', $selected_categories) . '")';
+            }
+            if ( count($selected_tags) > 0 ) {
+                $url .= '&fq=tags:("' . join('" OR "', $selected_tags) . '")';
+            }
+            $url .= '&fl=id,title,thumbnail,url,summary,post_type,categories,tags';
+            $url .= '&start=' . $start;
+            $url .= '&rows=' . $meta['search_result_count'][0];
+            $url .= '&facet=true';
+            $url .= '&facet.mincount=1';
+            $url .= '&facet.field=categories';
+            $url .= '&facet.field=tags';
+            $url .= '&facet.field=post_type';
+            $url .= '&f.categories.facet.sort=index';
+            $url .= '&f.tags.facet.sort=index';
+            $url .= '&f.post_type.facet.sort=index';
+            $url .= '&wt=json';
+			$args = array(
+			    'headers' => array(
+			        'Authorization' => 'Token ' . $token
+			    )
+			);
+
+			$response = wp_remote_get( $url, $args );
+			$body = wp_remote_retrieve_body( $response );
+			$json = json_decode( $body, true );
+			
+			if (isset($json['message'])) {
+				$return['status'] = 'failed';
+				$return['data'] = $json['message'];
+			}
+			elseif ( $json != null && isset($json['response']) ) {
+				$return['status'] = 'success';
+				$return['data'] = $json['response'];
+				$return['config'] = $meta['search_result_count'][0];
+				$return['facet_counts'] = $json['facet_counts'];
+				$return['url'] = $url;
 			}
 			else {
 				$return['status'] = 'failed';
@@ -361,10 +546,12 @@ class Searchstax_Serverless_Admin {
 	    die( json_encode( $return ) );
 	}
 
-	public function post_to_solr( $post, $solr_id ) {
+	public function post_to_solr_json( $post, $solr_id ) {
 		/*
 		 * Create the JSON object to submit to Solr from a WordPress post
 		 */
+
+		$max_doc_size = 100000;
 
 		$post_categories = wp_get_post_categories($post->ID);
 		$categories = array();
@@ -383,8 +570,13 @@ class Searchstax_Serverless_Admin {
 		
 		$solrDoc['id'] = $solr_id;
 		$solrDoc['title'] = $post->post_title;
-		$solrDoc['summary'] = $post->post_excerpt;
-		$solrDoc['body'] = $post->post_content;
+		if( $post->post_excerpt != '' ) {
+			$solrDoc['summary'] = $post->post_excerpt;
+		}
+		else {
+			$soldDoc['summary'] = substr( wp_strip_all_tags( $doc['body'][0], true ), 0, 300 );
+		}
+		$solrDoc['body'] = substr( $post->post_content, 0, $max_doc_size );
 		$solrDoc['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );
 		$solrDoc['guid'] = $post->guid;
 		$solrDoc['url'] = get_permalink($post);
@@ -409,6 +601,7 @@ class Searchstax_Serverless_Admin {
 					'post_title' => $_POST['search_title'],
 				));
 				$post_id = $_POST['search_page_id'];
+				update_post_meta($post_id, 'search_config', $_POST['search_config']);
 				update_post_meta($post_id, 'search_display', $_POST['search_display']);
 				update_post_meta($post_id, 'search_result_count', $_POST['search_result_count']);
 				if ( isset($_POST['search_result_post_types']) ) {
@@ -439,6 +632,7 @@ class Searchstax_Serverless_Admin {
 					'comment_status' => 'closed',
 					'ping_status' => 'closed',
 				));
+				add_post_meta($post_id, 'search_config', $_POST['search_config'], true);
 				add_post_meta($post_id, 'search_display', $_POST['search_display'], true);
 				add_post_meta($post_id, 'search_result_count', $_POST['search_result_count'], true);
 				if ( isset($_POST['search_result_post_types']) ) {
@@ -464,7 +658,6 @@ class Searchstax_Serverless_Admin {
 			exit;
 			die();
 		}
-
 	}
 
 	public function post_edit_hook($post_id, $post, $update) {
@@ -477,19 +670,9 @@ class Searchstax_Serverless_Admin {
 
 		if ( $write_token != '' && $update_api != '' && ($post->post_type == 'page' || $post->post_type == 'post') ) {
 			$post = get_post($post_id);
-
-			$url = $update_api . '?commit=true';
-			$args = array(
-				'body' => json_encode([$this->post_to_solr($post, $post->post_type . '_' . $post->ID)]),
-			    'headers' => array(
-			        'Authorization' => 'Token ' . $write_token,
-			        'Content-type' => 'application/json'
-			    )
-			);
-
-			$response = wp_remote_post( $url, $args );
+			$status = $this->push_to_solr( [$post] );
 			
-			if ( $response['response']['code'] == 200) {
+			if ( $status['status'] == 'success' ) {
 				//echo 'Successfully added pages';
 			}
 		}
@@ -523,7 +706,6 @@ class Searchstax_Serverless_Admin {
 			exit;
 			die();
 		}
-
 	}
 
 	/**
@@ -538,10 +720,6 @@ class Searchstax_Serverless_Admin {
   			'numberposts' => -1
 		]);
 		$selected_search_page = get_option('searchstax_serverless_site_search');
-		$active_tab = 'account';
-		if ( isset($_GET[ 'tab' ]) ) {
-			$active_tab = $_GET[ 'tab' ];
-		}
 		?>
 			<div class="wrap">
 				<h1>SearchStax Serverless Options</h1>
@@ -575,11 +753,11 @@ class Searchstax_Serverless_Admin {
 								</div>
 								<div>
 									<h4>Read-Only Token</h4>
-									<input type="text" name="searchstax_serverless_token_read" value="<?php echo esc_attr( get_option('searchstax_serverless_token_read') ); ?>" />
+									<input type="text" name="searchstax_serverless_token_read" value="<?php echo esc_attr( get_option('searchstax_serverless_token_read') ); ?>" size=50 />
 								</div>
 								<div>
-									<h4>Select API</h4>
-									<input type="text" name="searchstax_serverless_api_select" value="<?php echo esc_attr( get_option('searchstax_serverless_api_select') ); ?>" />
+									<h4>Select API URL</h4>
+									<input type="text" name="searchstax_serverless_api_select" value="<?php echo esc_attr( get_option('searchstax_serverless_api_select') ); ?>" size=50 />
 								</div>
 								<div>
 									<h3>Write/Update</h3>
@@ -587,11 +765,11 @@ class Searchstax_Serverless_Admin {
 								</div>
 								<div>
 									<h4>Write Token</h4>
-									<input type="text" name="searchstax_serverless_token_write" value="<?php echo esc_attr( get_option('searchstax_serverless_token_write') ); ?>" />
+									<input type="text" name="searchstax_serverless_token_write" value="<?php echo esc_attr( get_option('searchstax_serverless_token_write') ); ?>" size=50 />
 								</div>
 								<div>
-									<h4>Update API</h4>
-									<input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" />
+									<h4>Update API URL</h4>
+									<input type="text" name="searchstax_serverless_api_update" value="<?php echo esc_attr( get_option('searchstax_serverless_api_update') ); ?>" size=50 />
 								</div>
 								<?php submit_button(); ?>
 							</div>
@@ -621,5 +799,4 @@ class Searchstax_Serverless_Admin {
 			</div>
 		<?php
 	}
-
 }

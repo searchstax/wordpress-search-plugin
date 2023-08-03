@@ -13,7 +13,16 @@
 }
 
 .searchstax_serverless_search_submit {
+    margin-left: 12px;
     width: 25%;
+}
+
+.searchstax_serverless_search_results {
+    display: flex;
+}
+
+.searchstax_serverless_search_facets {
+    width: 20%;
 }
 
 .searchstax_serverless_facet {
@@ -52,21 +61,24 @@
 }
 
 .searchstax_serverless_results {
+    width: 80%;
     color: #333333;
 }
 
 .searchstax_serverless_thumbnail_frame {
-    width: 20%;
+    width: 30%;
     margin-right: 10px;
 }
 
 .searchstax_serverless_thumbnail {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
 }
 
 .searchstax_serverless_snippet {
     width: 80%;
+    padding: 12px;
 }
 
 .searchstax_serverless_snippet_text_link {
@@ -86,7 +98,6 @@
     position: relative;
     display: flex;
     margin: 12px 0;
-    padding: 6px;
     border: solid;
     border-width: 1px;
     border-color: #DDDDDD;
@@ -103,7 +114,7 @@
 .searchstax_serverless_result_pagination {
     margin: 12px 0;
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: 150px auto 150px;
     text-align: center;
 }
 
@@ -113,4 +124,46 @@
 
 .searchstax_serverless_result_pagination form:last-of-type {
     text-align: right;
+}
+
+
+#searchstax_serverless_dynamic_loader {
+    display: none;
+    margin: 0 10px;
+}
+
+.searchstax_serverless_loader, .searchstax_serverless_loader:before, .searchstax_serverless_loader:after {
+  border-radius: 50%;
+  width: 1.5em;
+  height: 1.5em;
+  animation-fill-mode: both;
+  animation: searchstax_serverless_loading 1.8s infinite ease-in-out;
+}
+
+.searchstax_serverless_loader {
+  color: #999;
+  font-size: 7px;
+  position: relative;
+  text-indent: -9999em;
+  transform: translateY(-15px);
+  animation-delay: -0.16s;
+  line-height: 20px;
+}
+.searchstax_serverless_loader:before,
+.searchstax_serverless_loader:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+.searchstax_serverless_loader:before {
+  left: -1.5em;
+  animation-delay: -0.32s;
+}
+.searchstax_serverless_loader:after {
+  left: 1.5em;
+}
+
+@keyframes searchstax_serverless_loading {
+  0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+  40% { box-shadow: 0 2.5em 0 0 }
 }
