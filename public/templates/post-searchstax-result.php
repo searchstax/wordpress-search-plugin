@@ -26,6 +26,9 @@ get_header();
 $post = $GLOBALS['post'];
 $meta = get_post_meta($post->ID);
 
+$show_search_bar = get_post_meta($post->ID, 'search_bar', true);
+$fixed_search_query = get_post_meta($post->ID, 'fixed_search_query', true);
+
 if ( $meta['search_config'][0] == 'config_static' ) {
 
     $selected_post_types = get_post_meta($post->ID, 'search_result_post_types', true);
@@ -52,15 +55,22 @@ if ( $meta['search_config'][0] == 'config_static' ) {
 
     ?>
     <div class="container">
-        <div>
-            <form action="">
-                <div class="searchstax_serverless_search_bar">
-                    <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php echo $query; ?>" autocomplete="off" />
-                    <input class="searchstax_serverless_search_submit" type="submit" value="Search" />
+        <?php
+            if( $show_search_bar != 'fixed_search' ) {
+            ?>
+                <div>
+                    <form action="">
+                        <div class="searchstax_serverless_search_bar">
+                            <input class="searchstax_serverless_search_input" type="text" name="searchQuery" value="<?php echo $query; ?>" autocomplete="off" />
+                            <input class="searchstax_serverless_search_submit" type="submit" value="Search" />
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </div>
-        <?php 
+            <?php 
+            }
+            else {
+                $query = $fixed_search_query;
+            }
             $token = get_option('searchstax_serverless_token_read');
             $select_api = get_option('searchstax_serverless_api_select');
             if ( $query != '' && $token != '' && $select_api != '' ) {
@@ -137,7 +147,10 @@ if ( $meta['search_config'][0] == 'config_static' ) {
                     else {
                         echo $start + $meta['search_result_count'][0];
                     }
-                    echo '</strong> of <strong>' . $json['response']['numFound'] . '</strong> results for <strong>"' . $query . '"</strong>';
+                    echo '</strong> of <strong>' . $json['response']['numFound'] . '</strong>';
+                    if ( $show_search_bar != 'fixed_search' ) {
+                        echo ' results for <strong>"' . $query . '"</strong>';
+                    }
                     echo '</div>';
                     echo '<div class="searchstax_serverless_search_results">';
                     echo '<div class="searchstax_serverless_search_facets">';
@@ -193,7 +206,7 @@ if ( $meta['search_config'][0] == 'config_static' ) {
                             echo '</div>';
                         }
                         echo '<div class="searchstax_serverless_snippet">';
-                        echo '<h3><a href="' . $doc['url'] . '" class="searchstax_serverless_result_link">' . $doc['title'] . '</a></h3>';
+                        echo '<h4><a href="' . $doc['url'] . '" class="searchstax_serverless_result_link">' . $doc['title'] . '</a></h4>';
                         echo '<div>' . $doc['summary'][0] . '</div>';
                         if ( array_key_exists('url', $doc) ) {
                             echo '<div><a href="' . $doc['url'] . '">' . $doc['url'] . '</a></div>';
@@ -259,19 +272,26 @@ if ( $meta['search_config'][0] == 'config_static' ) {
 if ( $meta['search_config'][0] == 'config_dynamic' ) {
     ?>
         <div class="container">
-            <div>
-                <div class="searchstax_serverless_search_bar">
-                    <input id="searchstax_serverless_dynamic_search_input" class="searchstax_serverless_search_input" type="text" name="searchQuery" autocomplete="off" />
-                    <button id="searchstax_serverless_dynamic_search_submit" class="searchstax_serverless_search_submit" type="submit">
-                        <div id="searchstax_serverless_dynamic_label">
-                            Search
-                        </div>
-                        <div id="searchstax_serverless_dynamic_loader">
-                            <div class="searchstax_serverless_loader"></div>
-                        </div>
-                    </button>
+            <?php if( $show_search_bar != 'fixed_search' ) { ?>
+                <div>
+                    <div class="searchstax_serverless_search_bar">
+                        <input id="searchstax_serverless_dynamic_search_input" class="searchstax_serverless_search_input" type="text" name="searchQuery" autocomplete="off" />
+                        <button id="searchstax_serverless_dynamic_search_submit" class="searchstax_serverless_search_submit" type="submit">
+                            <div id="searchstax_serverless_dynamic_label">
+                                Search
+                            </div>
+                            <div id="searchstax_serverless_dynamic_loader">
+                                <div class="searchstax_serverless_loader"></div>
+                            </div>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            <?php
+                }
+                else {
+                    echo '<input id="searchstax_serverless_dynamic_fixed_search_query" type="hidden" value="' . $fixed_search_query . '" />';
+                }
+            ?>
             <div id="searchstax_serverless_dynamic_status_message"></div>
             <div id="searchstax_serverless_dynamic_search_count"></div>
             <input id="searchstax_serverless_dynamic_post_id" type="hidden" value="<?php echo $post->ID ?>" />
@@ -280,14 +300,12 @@ if ( $meta['search_config'][0] == 'config_dynamic' ) {
                 <div class="searchstax_serverless_results">
                     <?php
                     if ($meta['search_display'][0] == 'display_grid') {
-                        echo '<div class="searchstax_serverless_grid">';
+                        echo '<div id="searchstax_serverless_dynamic_results" class="searchstax_serverless_grid"></div>';
                     }
                     if ($meta['search_display'][0] == 'display_inline') {
-                        echo '<div class="searchstax_serverless_inline">';
+                        echo '<div id="searchstax_serverless_dynamic_results" class="searchstax_serverless_inline"></div>';
                     }
                     ?>
-                        <div id="searchstax_serverless_dynamic_results"></div>
-                    </div>
                 </div>
             </div>
             <div id="searchstax_serverless_result_dynamic_pagination" class="searchstax_serverless_result_pagination"></div>

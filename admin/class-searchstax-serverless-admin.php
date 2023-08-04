@@ -416,6 +416,15 @@ class Searchstax_Serverless_Admin {
 
 		$query = $_POST['q'];
 		$post_ID = $_POST['post_id'];
+		    
+	    $show_search_bar = get_post_meta($post_ID, 'search_bar', true);
+	    $fixed_search_query = get_post_meta($post_ID, 'fixed_search_query', true);
+
+	    $return['query'] = $fixed_search_query;
+
+	    if( $show_search_bar == 'fixed_search' ) {
+	    	$query = $fixed_search_query;
+	    }
 
         if ( $query != '' && $post_ID != '' && $token != '' && $select_api != '' ) {
 		
@@ -528,7 +537,7 @@ class Searchstax_Serverless_Admin {
 				$return['status'] = 'failed';
 				$return['data'] = $json['message'];
 			}
-			elseif ( $json != null && isset($json['response']) ) {
+			elseif ( $json != null && isset($json['responseHeader']) && $json['responseHeader']['status'] == 0 ) {
 				$return['status'] = 'success';
 				$return['data'] = $json['response'];
 			}
@@ -603,6 +612,8 @@ class Searchstax_Serverless_Admin {
 				$post_id = $_POST['search_page_id'];
 				update_post_meta($post_id, 'search_config', $_POST['search_config']);
 				update_post_meta($post_id, 'search_display', $_POST['search_display']);
+				update_post_meta($post_id, 'search_bar', $_POST['search_bar']);
+				update_post_meta($post_id, 'fixed_search_query', $_POST['fixed_search_query']);
 				update_post_meta($post_id, 'search_result_count', $_POST['search_result_count']);
 				if ( isset($_POST['search_result_post_types']) ) {
 					update_post_meta($post_id, 'search_result_post_types', $_POST['search_result_post_types']);
@@ -634,6 +645,8 @@ class Searchstax_Serverless_Admin {
 				));
 				add_post_meta($post_id, 'search_config', $_POST['search_config'], true);
 				add_post_meta($post_id, 'search_display', $_POST['search_display'], true);
+				add_post_meta($post_id, 'search_bar', $_POST['search_bar']);
+				add_post_meta($post_id, 'fixed_search_query', $_POST['fixed_search_query']);
 				add_post_meta($post_id, 'search_result_count', $_POST['search_result_count'], true);
 				if ( isset($_POST['search_result_post_types']) ) {
 					add_post_meta($post_id, 'search_result_post_types', $_POST['search_result_post_types']);

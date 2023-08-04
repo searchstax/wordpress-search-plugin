@@ -39,6 +39,9 @@
 				query = urlParams.get('searchQuery');
 				$('#searchstax_serverless_dynamic_search_input').val(query);
 			}
+			if ($('#searchstax_serverless_dynamic_fixed_search_query').length > 0) {
+				query = $('#searchstax_serverless_dynamic_fixed_search_query').val();
+			}
 			
 			if (urlParams.get('start')) {
 				params.start = urlParams.get('start');
@@ -64,8 +67,6 @@
 						var response = JSON.parse(data);
 
 						$('#searchstax_serverless_dynamic_results').empty();
-
-						var searchstax_serverless_dynamic_results = $('<div>');
 	    				$.each(response['data']['docs'], function(i, doc) {
 	    					//var fd = new Date(doc['post_date'][0]);
 					        var div= $('<div>').addClass('searchstax_serverless_result');
@@ -85,7 +86,7 @@
 					            $('<div>')
 					        		.addClass('searchstax_serverless_snippet')
 				        			.append(
-				        				$('<h3>')
+				        				$('<h4>')
 				        					.append(
 				        						$('<a>')
 					        						.addClass('searchstax_serverless_result_link')
@@ -100,9 +101,8 @@
 				        						.text(doc['url']))
 				        			)
 					        );
-					        searchstax_serverless_dynamic_results.append(div);
+					        $('#searchstax_serverless_dynamic_results').append(div);
 					     });
-						$('#searchstax_serverless_dynamic_results').append(searchstax_serverless_dynamic_results);
 
 	    				var resultCount = 'Showing <strong>' + (Number(params.start) + 1) + ' - ';
 	                    if ((params.start + response['config']) > response['data']['numFound']) {
@@ -111,7 +111,11 @@
 	                    else {
 	                        resultCount += (Number(params.start) + Number(response['config']));
 	                    }
-	                    resultCount += '</strong> of <strong>' + response['data']['numFound'] + '</strong> results for <strong>"' + query + '"</strong>';
+	                    resultCount += '</strong> of <strong>' + response['data']['numFound'] + '</strong>';
+						
+						if ($('#searchstax_serverless_dynamic_fixed_search_query').length > 0) {
+							resultCount += ' results for <strong>"' + query + '"</strong>';
+						}
 
 	    				$('#searchstax_serverless_dynamic_search_count').html(resultCount);
 

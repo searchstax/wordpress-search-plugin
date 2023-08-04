@@ -100,6 +100,25 @@ $unindexable_types = array(
                 </div>
             </div>
             <div>
+                <h2>Search Bar</h2>
+                <div>
+                    <input type="radio" value="user_search" name="search_bar" <?php if ( (isset($meta['search_bar']) && $meta['search_bar'][0] == "user_search") || !isset($meta['search_bar']) ) { echo 'checked'; } ?>/>
+                    <label for="user_search">User Search Query (Show Search Bar)</label>
+                </div>
+                <div>
+                    <input type="radio" value="fixed_search" name="search_bar"  <?php if ( isset($meta['search_bar']) && $meta['search_bar'][0] == "fixed_search") { echo 'checked'; } ?>/>
+                    <label for="fixed_search">Fixed Search Query (Search Bar Hidden)</label>
+                </div>
+                <div>
+                    <input type="text" name="fixed_search_query" value="<?php 
+                    if ( isset($meta['fixed_search_query']) ) {
+                        echo $meta['fixed_search_query'][0];
+                    }
+                    ?>"/>
+                    <p>Use <code>*</code> to show all results
+                </div>
+            </div>
+            <div>
                 <h2>Result Count</h2>
                 <select name="search_result_count">
                     <option value="10" <?php if ( isset($meta['search_result_count']) && $meta['search_result_count'][0] == "10") { echo 'selected'; } ?>>10 per page</option>

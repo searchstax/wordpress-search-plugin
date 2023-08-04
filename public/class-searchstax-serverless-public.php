@@ -131,6 +131,8 @@ class Searchstax_Serverless_Public {
 	public function get_search_results() {
 		/*
 		 * Handle AJAX request for getting search results
+		 *
+		 * This is currently  duplicate of the admin function needed for separate public/admin enqueueing
 		 */
 
         //check_ajax_referer('check_api_status', 'nonce');
@@ -144,6 +146,15 @@ class Searchstax_Serverless_Public {
 
 		$query = $_POST['q'];
 		$post_ID = $_POST['post_id'];
+		    
+	    $show_search_bar = get_post_meta($post_ID, 'search_bar', true);
+	    $fixed_search_query = get_post_meta($post_ID, 'fixed_search_query', true);
+
+	    $return['query'] = $fixed_search_query;
+
+	    if( $show_search_bar == 'fixed_search' ) {
+	    	$query = $fixed_search_query;
+	    }
 
         if ( $query != '' && $post_ID != '' && $token != '' && $select_api != '' ) {
 		

@@ -31,7 +31,7 @@ class Searchstax_Serverless_Admin_Index_Table {
                 <h2>Indexed Items</h2>
                 <div class="tablenav">
                     <span>
-                        <button id="searchstax_serverless_index_content_now" class="button">
+                        <button id="searchstax_serverless_index_content_now" class="button" type="button">
                             Index All Content
                             <div id="searchstax_serverless_index_loader">
                                 <div class="searchstax_serverless_loader"></div>
@@ -39,7 +39,7 @@ class Searchstax_Serverless_Admin_Index_Table {
                         </button>
                     </span>
                     <span>
-                        <button id="searchstax_serverless_delete_items" class="button">
+                        <button id="searchstax_serverless_delete_items" class="button" type="button">
                             Delete All Content from Index
                             <div id="searchstax_serverless_delete_loader">
                                 <div class="searchstax_serverless_loader"></div>
