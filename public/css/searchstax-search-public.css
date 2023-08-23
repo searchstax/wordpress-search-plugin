@@ -1,0 +1,213 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+
+.searchstax_search_search_bar {
+	display: flex;
+	margin: 20px 0;
+}
+
+.searchstax_search_search_input {
+	width: 70%;
+}
+
+.searchstax_search_search_submit {
+	margin-left: 12px;
+	width: 25%;
+}
+
+.searchstax_search_search_results {
+	display: flex;
+}
+
+.searchstax_search_search_facets {
+	width: 20%;
+}
+
+.searchstax_search_facet {
+	display: block;
+}
+
+.searchstax_search_facet_link {
+	 background: none;
+	 border: none;
+	 cursor: pointer;
+}
+
+.searchstax_search_toggle {
+	display: none;
+}
+
+.searchstax_search_toggle_label {
+	display: block;
+	padding: 4px;
+	cursor: pointer;
+	transition: all 0.25s ease-out;
+}
+
+.searchstax_search_toggle_label::before {
+	content: ' ';
+	display: inline-block;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 5px solid currentColor;
+	vertical-align: middle;
+	margin-right: 5px;
+}
+
+.searchstax_search_toggle:checked+.searchstax_search_toggle_label::before {
+	transform: rotate(90deg) translateX(-3px);
+}
+
+.searchstax_search_facet_container {
+	max-height: 220px;
+	overflow: hidden;
+	transition: max-height .25s ease-in-out;
+}
+
+.searchstax_search_toggle:checked + .searchstax_search_toggle_label + .searchstax_search_facet_container {
+	max-height: 100%;
+}
+
+.searchstax_search_result_link {
+	background: none;
+	border: none;
+	text-decoration: none;
+	cursor: pointer;
+	color: #333333;
+	z-index: 10;
+}
+
+.searchstax_search_result_link::after {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	pointer-events: auto;
+	content: "";
+	background-color: transparent;
+}
+
+.searchstax_search_result_sublink {
+	z-index: 100;
+}
+
+.searchstax_search_results {
+	width: 80%;
+	color: #333333;
+}
+
+.searchstax_search_thumbnail_frame {
+	width: 30%;
+	margin-right: 10px;
+}
+
+.searchstax_search_thumbnail {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.searchstax_search_snippet {
+	width: 80%;
+	padding: 12px;
+}
+
+.searchstax_search_snippet_text_link {
+	color: #333333;
+}
+
+.searchstax_search_grid {
+	display: grid;
+	grid-template-columns: auto auto auto;
+}
+
+.searchstax_search_inline {
+
+}
+
+.searchstax_search_result {
+	position: relative;
+	display: flex;
+	margin: 12px 0;
+	border: solid;
+	border-width: 1px;
+	border-color: #DDDDDD;
+}
+
+.searchstax_search_grid .searchstax_search_thumbnail_frame {
+	width: 100%;
+}
+
+.searchstax_search_grid .searchstax_search_result {
+	display: grid;
+	grid-template-rows: auto auto;
+	margin: 12px;
+}
+
+.searchstax_search_inline_form {
+	display: inline;
+}
+
+.searchstax_search_category_link, .searchstax_search_tag_link {
+	margin: 0 3px;
+}
+
+.searchstax_search_result_pagination {
+	margin: 12px 0;
+	display: grid;
+	grid-template-columns: 150px auto 150px;
+	text-align: center;
+}
+
+.searchstax_search_result_pagination form:first-of-type {
+	text-align: left;
+}
+
+.searchstax_search_result_pagination form:last-of-type {
+	text-align: right;
+}
+
+
+#searchstax_search_dynamic_loader {
+	display: none;
+	margin: 0 10px;
+}
+
+.searchstax_search_loader, .searchstax_search_loader:before, .searchstax_search_loader:after {
+	border-radius: 50%;
+	width: 1.5em;
+	height: 1.5em;
+	animation-fill-mode: both;
+	animation: searchstax_search_loading 1.8s infinite ease-in-out;
+}
+
+.searchstax_search_loader {
+	font-size: 7px;
+	position: relative;
+	text-indent: -9999em;
+	transform: translateY(-15px);
+	animation-delay: -0.16s;
+	line-height: 20px;
+}
+.searchstax_search_loader:before,
+.searchstax_search_loader:after {
+	content: '';
+	position: absolute;
+	top: 0;
+}
+.searchstax_search_loader:before {
+	left: -1.5em;
+	animation-delay: -0.32s;
+}
+.searchstax_search_loader:after {
+	left: 1.5em;
+}
+
+@keyframes searchstax_search_loading {
+	0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+	40% { box-shadow: 0 2.5em 0 0 }
+}

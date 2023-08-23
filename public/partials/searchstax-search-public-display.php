@@ -6,10 +6,10 @@
  * This file is used to markup the public-facing aspects of the plugin.
  *
  * @link       https://www.searchstax.com
- * @since      0.1.0
+ * @since      1.0.0
  *
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/public/partials
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/public/partials
  */
 ?>
 

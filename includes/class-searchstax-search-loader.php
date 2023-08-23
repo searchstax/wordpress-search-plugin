@@ -4,10 +4,10 @@
  * Register all actions and filters for the plugin
  *
  * @link       https://www.searchstax.com
- * @since      0.1.0
+ * @since      1.0.0
  *
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  */
 
 /**
@@ -17,16 +17,16 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  * @author     Your Name <email@example.com>
  */
-class Searchstax_Serverless_Loader {
+class Searchstax_Search_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 * @access   protected
 	 * @var      array    $actions    The actions registered with WordPress to fire when the plugin loads.
 	 */
@@ -35,7 +35,7 @@ class Searchstax_Serverless_Loader {
 	/**
 	 * The array of filters registered with WordPress.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 * @access   protected
 	 * @var      array    $filters    The filters registered with WordPress to fire when the plugin loads.
 	 */
@@ -56,7 +56,7 @@ class Searchstax_Serverless_Loader {
 	/**
 	 * Add a new action to the collection to be registered with WordPress.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 * @param    string               $hook             The name of the WordPress action that is being registered.
 	 * @param    object               $component        A reference to the instance of the object on which the action is defined.
 	 * @param    string               $callback         The name of the function definition on the $component.
@@ -70,7 +70,7 @@ class Searchstax_Serverless_Loader {
 	/**
 	 * Add a new filter to the collection to be registered with WordPress.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 * @param    string               $hook             The name of the WordPress filter that is being registered.
 	 * @param    object               $component        A reference to the instance of the object on which the filter is defined.
 	 * @param    string               $callback         The name of the function definition on the $component.
@@ -85,7 +85,7 @@ class Searchstax_Serverless_Loader {
 	 * A utility function that is used to register the actions and hooks into a single
 	 * collection.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 * @access   private
 	 * @param    array                $hooks            The collection of hooks that is being registered (that is, actions or filters).
 	 * @param    string               $hook             The name of the WordPress filter that is being registered.
@@ -112,7 +112,7 @@ class Searchstax_Serverless_Loader {
 	/**
 	 * Register the filters and actions with WordPress.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 */
 	public function run() {
 

@@ -3,85 +3,71 @@
  * included in this file.
  */
 
-.searchstax_serverless_tab_button {
-	border: solid;
-	border-width: 1px;
-	border-bottom-width: 0;
-	padding: 12px;
-}
-.searchstax_serverless_tab_button_selected {
-	border: solid;
-	border-width: 1px;
-	border-bottom-width: 0;
-	padding: 12px;
-	background-color: #CCC;
-}
-
-.searchstax_serverless_tab {
+.searchstax_search_tab {
 	display: none;
 }
 
-.searchstax_serverless_tab_visible {
+.searchstax_search_tab_visible {
 	display: block;
 }
 
-.searchstax_serverless_option_frame {
+.searchstax_search_option_frame {
 	padding: 6px;
 }
 
-#searchstax_serverless_index_tab, #searchstax_serverless_sitesearch_tab, #searchstax_serverless_account_tab {
+#searchstax_search_index_tab, #searchstax_search_sitesearch_tab, #searchstax_search_account_tab {
 	cursor: pointer;
 }
 
-#searchstax_serverless_index_content_now, #searchstax_serverless_get_indexed_items, #searchstax_serverless_delete_items  {
+#searchstax_search_index_content_now, #searchstax_search_get_indexed_items, #searchstax_search_delete_items  {
 	height: 30px;
 	border: solid;
 	border-width: 1px;
 	cursor: pointer;
 }
 
-#searchstax_serverless_index_loader, #searchstax_serverless_indexed_loader, #searchstax_serverless_delete_loader {
+#searchstax_search_index_loader, #searchstax_search_indexed_loader, #searchstax_search_delete_loader {
 	display: none;
 	margin: 0 10px;
 }
 
-.searchstax_serverless_loader, .searchstax_serverless_loader:before, .searchstax_serverless_loader:after {
-  border-radius: 50%;
-  width: 1.5em;
-  height: 1.5em;
-  animation-fill-mode: both;
-  animation: searchstax_serverless_loading 1.8s infinite ease-in-out;
+.searchstax_search_loader, .searchstax_search_loader:before, .searchstax_search_loader:after {
+	border-radius: 50%;
+	width: 1.5em;
+	height: 1.5em;
+	animation-fill-mode: both;
+	animation: searchstax_search_loading 1.8s infinite ease-in-out;
 }
 
-.searchstax_serverless_loader {
-  color: #999;
-  font-size: 7px;
-  position: relative;
-  text-indent: -9999em;
-  transform: translateY(-15px);
-  animation-delay: -0.16s;
-  line-height: 20px;
+.searchstax_search_loader {
+	color: #999;
+	font-size: 7px;
+	position: relative;
+	text-indent: -9999em;
+	transform: translateY(-15px);
+	animation-delay: -0.16s;
+	line-height: 20px;
 }
-.searchstax_serverless_loader:before,
-.searchstax_serverless_loader:after {
-  content: '';
-  position: absolute;
-  top: 0;
+.searchstax_search_loader:before,
+.searchstax_search_loader:after {
+	content: '';
+	position: absolute;
+	top: 0;
 }
-.searchstax_serverless_loader:before {
-  left: -1.5em;
-  animation-delay: -0.32s;
+.searchstax_search_loader:before {
+	left: -1.5em;
+	animation-delay: -0.32s;
 }
-.searchstax_serverless_loader:after {
-  left: 1.5em;
-}
-
-@keyframes searchstax_serverless_loading {
-  0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
-  40% { box-shadow: 0 2.5em 0 0 }
+.searchstax_search_loader:after {
+	left: 1.5em;
 }
 
-.searchstax_serverless_powered {
+@keyframes searchstax_search_loading {
+	0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+	40% { box-shadow: 0 2.5em 0 0 }
+}
+
+.searchstax_search_powered {
 	display: inline-block;
 	width: 150px;
 	height: 20px;
@@ -89,7 +75,7 @@
 	background-size: 150px;
 }
 
-.searchstax_serverless_scroll_container {
+.searchstax_search_scroll_container {
 	max-height: 400px;
 	width: 400px;
 	overflow-y: auto;

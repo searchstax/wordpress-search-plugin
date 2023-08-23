@@ -4,10 +4,10 @@
  * Fired during plugin activation
  *
  * @link       https://www.searchstax.com
- * @since      0.1.0
+ * @since      1.0.0
  *
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  */
 
 /**
@@ -15,19 +15,19 @@
  *
  * This class defines all code necessary to run during the plugin's activation.
  *
- * @since      0.1.0
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @since      1.0.0
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  * @author     Your Name <email@example.com>
  */
-class Searchstax_Serverless_Activator {
+class Searchstax_Search_Activator {
 
 	/**
 	 * Short Description. (use period)
 	 *
 	 * Long Description.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 */
 	public static function activate() {
 

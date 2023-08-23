@@ -7,10 +7,10 @@
  * so that it is ready for translation.
  *
  * @link       https://www.searchstax.com
- * @since      0.1.0
+ * @since      1.0.0
  *
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  */
 
 /**
@@ -19,23 +19,23 @@
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @since      0.1.0
- * @package    Searchstax_Serverless
- * @subpackage Searchstax_Serverless/includes
+ * @since      1.0.0
+ * @package    Searchstax_Search
+ * @subpackage Searchstax_Search/includes
  * @author     Your Name <email@example.com>
  */
-class Searchstax_Serverless_i18n {
+class Searchstax_Search_i18n {
 
 
 	/**
 	 * Load the plugin text domain for translation.
 	 *
-	 * @since    0.1.0
+	 * @since    1.0.0
 	 */
 	public function load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'searchstax-serverless',
+			'searchstax-search',
 			false,
 			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
 		);

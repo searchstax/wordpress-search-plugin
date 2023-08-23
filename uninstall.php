@@ -20,9 +20,9 @@
  * https://github.com/tommcfarlin/WordPress-Plugin-Boilerplate/pull/123#issuecomment-28541913
  *
  * @link       https://www.searchstax.com
- * @since      0.1.0
+ * @since      1.0.0
  *
- * @package    Searchstax_Serverless
+ * @package    Searchstax_Search
  */
 
 // If uninstall not called from WordPress, then exit.
