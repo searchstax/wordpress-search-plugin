@@ -206,6 +206,7 @@ class Searchstax_Search {
 				'singular_name' => __('SearchStax Result', 'searchstax_search'),
 			),
 			'show_in_menu' => true,
+			'rewrite' => array( 'with_front' => false ),
 			'public' => true,
 			'supports' => array('title', 'thumbnail'), 
 			'has_archive' => false,

@@ -279,6 +279,8 @@ class Searchstax_Search_Admin {
 			$api = $this->get_write_api();
 
 			if ( $api['available'] ) {
+				$this->update_schema();
+				
 				$post_batch = array();
 
 				$posts = get_posts(['post_status' => 'publish', 'numberposts' => -1]);
