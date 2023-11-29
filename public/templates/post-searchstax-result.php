@@ -47,7 +47,7 @@ if ( $meta['search_config'][0] == 'config_static' ) {
 	}
 
 	?>
-	<div class="container">
+	<div class="searchstax_search_container">
 		<?php
 			if( $show_search_bar != 'fixed_search' ) {
 			?>
@@ -211,14 +211,14 @@ if ( $meta['search_config'][0] == 'config_static' ) {
 					}
 					foreach ( $json['response']['docs'] as $doc ) {
 						echo '<div class="searchstax_search_result">';
-						if ( array_key_exists('thumbnail', $doc) && $doc['thumbnail'][0] !== 'false') {
+						if ( array_key_exists('thumbnail', $doc) && $doc['thumbnail'] !== 'false') {
 							echo '<div class="searchstax_search_thumbnail_frame">';
-							echo '<img class="searchstax_search_thumbnail" src="' . $doc['thumbnail'][0] . '">';
+							echo '<img class="searchstax_search_thumbnail" src="' . $doc['thumbnail'] . '">';
 							echo '</div>';
 						}
 						echo '<div class="searchstax_search_snippet">';
 						echo '<h4><a href="' . $doc['url'] . '" class="searchstax_search_result_link">' . $doc['title'] . '</a></h4>';
-						echo '<div>' . $doc['summary'][0] . '</div>';
+						echo '<div>' . $doc['summary'] . '</div>';
 						if ( array_key_exists('url', $doc) ) {
 							echo '<div><a href="' . $doc['url'] . '">' . $doc['url'] . '</a></div>';
 						}
@@ -256,7 +256,7 @@ if ( $meta['search_config'][0] == 'config_static' ) {
 }
 if ( $meta['search_config'][0] == 'config_dynamic' ) {
 	?>
-		<div class="container">
+		<div class="searchstax_search_container">
 			<?php if( $show_search_bar != 'fixed_search' ) { ?>
 				<div>
 					<div class="searchstax_search_search_bar">

@@ -41,13 +41,13 @@
 						$.each(response['data']['docs'], function(i, doc) {
 							var div= $('<div>').addClass('searchstax_search_result');
 
-							if (doc['thumbnail']) {
+							if (doc['thumbnail'] !== 'false') {
 								div.append(
 									$('<div>').addClass('searchstax_search_thumbnail_frame')
 										.append(
 											$('<img>')
 											.addClass('searchstax_search_thumbnail')
-											.attr('src', doc['thumbnail'][0])
+											.attr('src', doc['thumbnail'])
 										)
 								);
 							}
@@ -62,7 +62,7 @@
 													.attr('href', doc['url'])
 													.text(doc['title'])
 											),
-										$('<div>').text(doc['summary'] ? doc['summary'][0] : ''),
+										$('<div>').text(doc['summary'] ? doc['summary'] : ''),
 										$('<div>')
 											.append($('<a>')
 												.addClass('searchstax_search_result_link')

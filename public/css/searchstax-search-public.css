@@ -2,6 +2,10 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+.searchstax_search_container {
+	max-width: 1024px;
+	margin: auto;
+}
 
 .searchstax_search_search_bar {
 	display: flex;

@@ -67,7 +67,7 @@ if ( $token != '' && $select_api != '' && $write_token != '' && $update_api != '
 					</button>
 					<div id="searchstax_search_indexed_status_message"></div>
 					<p>Enter your account info to start indexing your WordPress pages and posts</p>
-					<p>Don't have SearchStax Search account? <a href="https://www.searchstax.com/managed-solr/search/" target="_blank">Sign up now</a></p>
+					<p>Don't have SearchStax Search account? <a href="https://app.searchstax.com/freetrial/" target="_blank">Sign up now</a></p>
 					<div>
 						<h3>Read</h3>
 						<p>Public token for fetching search results</p>

@@ -149,9 +149,11 @@ class Searchstax_Search_Admin {
 		$write_token = get_option('searchstax_search_token_write');
 		$update_api = get_option('searchstax_search_api_update');
 
-		if ($_POST['searchstax_search_token_write'] != '' && $_POST['searchstax_search_api_update'] != '') {
-			$write_token = $_POST['searchstax_search_token_write'];
-			$update_api = $_POST['searchstax_search_api_update'];
+		if (isset($_POST['searchstax_search_token_write']) && $token = $_POST['searchstax_search_token_write'] != '') {
+			if(isset($_POST['searchstax_search_api_update']) && $url = $_POST['searchstax_search_api_update'] != '') {
+				$write_token = $_POST['searchstax_search_token_write'];
+				$update_api = $_POST['searchstax_search_api_update'];
+			}
 		}
 
 		if ( is_admin() && $write_token != '' && $update_api != '' ) {
@@ -254,7 +256,7 @@ class Searchstax_Search_Admin {
 				$return['status'] = 'success';
 				$doc_ids = array();
 				foreach ( $docs as $doc ) {
-					$doc_ids[] = $doc->ID;
+					$doc_ids[] = $doc['id'];
 				}
 				$return['data'] = $doc_ids;
 			}
@@ -530,7 +532,7 @@ class Searchstax_Search_Admin {
 				}
 				elseif ( $json != null && isset($json['responseHeader']) && $json['responseHeader']['status'] == 0 ) {
 					$return['status'] = 'success';
-					$return['data'] = $json['response'];
+					$return['data'] = $json;
 				}
 				else {
 					$return['status'] = 'failed';
@@ -575,11 +577,12 @@ class Searchstax_Search_Admin {
 		
 		$solrDoc['id'] = $solr_id;
 		$solrDoc['title'] = $post->post_title;
+		$solrDoc['summary'] = '';
 		if( $post->post_excerpt != '' ) {
 			$solrDoc['summary'] = $post->post_excerpt;
 		}
 		else {
-			$soldDoc['summary'] = substr( wp_strip_all_tags( $doc['body'][0], true ), 0, 300 );
+			$solrDoc['summary'] = substr( wp_strip_all_tags( $post->post_content, true ), 0, 300 );
 		}
 		$solrDoc['body'] = substr( $post->post_content, 0, $max_doc_size );
 		$solrDoc['thumbnail'] = wp_get_attachment_url( get_post_thumbnail_id($post->ID), 'thumbnail' );
